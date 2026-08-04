@@ -11,7 +11,9 @@
      6. initFilters()    the Work category chips
      7. initCounters()   hero numbers ticking up from zero
      8. initCardGlow()   feed the cursor position to the CSS card glow
-     9. initMisc()       copyright year
+     9. showToast()      the slide-up confirmation message
+    10. initCopyButtons() copy-to-clipboard for anything with data-copy
+    11. initMisc()       copyright year
 
    HOW THIS FILE IS ORGANISED
      Nine small, INDEPENDENT features, each in its own function, all called
@@ -349,7 +351,117 @@ function initCardGlow() {
 
 
 /* ------------------------------------------------------------------ *
- * 9. SMALL BITS
+ * 9. TOAST
+ * ------------------------------------------------------------------
+ * A small confirmation message that slides up from the bottom.
+ *
+ * Deliberately NOT alert(). alert() freezes the whole page until it's
+ * dismissed, can't be styled, and reads as a browser error rather than a
+ * confirmation. A toast confirms and gets out of the way.
+ *
+ * The element carries role="status" aria-live="polite" in the HTML, so
+ * writing text into it is enough for a screen reader to announce it.
+ * ------------------------------------------------------------------ */
+let toastTimer = null;
+
+function showToast(message, isError) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.classList.toggle('toast--error', Boolean(isError));
+  toast.classList.add('is-visible');
+
+  // Reset any countdown already running, so rapid clicks don't hide the
+  // toast early — each new message gets the full display time.
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2200);
+}
+
+
+/* ------------------------------------------------------------------ *
+ * 10. COPY TO CLIPBOARD
+ * ------------------------------------------------------------------
+ * Wired to any element with a data-copy attribute, so adding a second
+ * copy button anywhere needs no changes here.
+ *
+ * TWO WAYS TO COPY, because one isn't enough:
+ *
+ *   navigator.clipboard  is the modern API, but it only exists in a
+ *                        "secure context" — https:// or localhost. Open
+ *                        the page as a file:// and it is undefined.
+ *   execCommand('copy')  is the deprecated fallback that still works
+ *                        essentially everywhere, including file://.
+ *
+ * Both must be triggered by a real user gesture; browsers block clipboard
+ * writes that aren't tied to a click, to stop pages hijacking it.
+ * ------------------------------------------------------------------ */
+function copyText(text) {
+  // Preferred path. Returns a promise.
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+
+  // Fallback: put the text in an off-screen textarea, select it, and let
+  // the browser copy the selection.
+  return new Promise((resolve, reject) => {
+    const helper = document.createElement('textarea');
+    helper.value = text;
+    // Off-screen rather than display:none — the browser can't select text
+    // inside an element it isn't rendering.
+    helper.setAttribute('readonly', '');
+    helper.style.position = 'fixed';
+    helper.style.top = '-1000px';
+    helper.style.opacity = '0';
+    document.body.appendChild(helper);
+
+    helper.select();
+    helper.setSelectionRange(0, text.length);   // iOS needs the explicit range
+
+    try {
+      document.execCommand('copy') ? resolve() : reject(new Error('copy rejected'));
+    } catch (err) {
+      reject(err);
+    } finally {
+      document.body.removeChild(helper);
+    }
+  });
+}
+
+function initCopyButtons() {
+  const buttons = Array.from(document.querySelectorAll('[data-copy]'));
+  if (!buttons.length) return;
+
+  buttons.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      // The button sits inside a card whose link opens the mail app.
+      // Without this, copying would ALSO launch the mail client.
+      event.preventDefault();
+      event.stopPropagation();
+
+      const text = button.dataset.copy;
+
+      copyText(text)
+        .then(() => {
+          showToast('Copied ' + text);
+
+          // Icon swaps to a tick, then back. Purely visual — the toast is
+          // what actually announces success to assistive tech.
+          button.classList.add('is-copied');
+          setTimeout(() => button.classList.remove('is-copied'), 1800);
+        })
+        .catch(() => {
+          // Never leave the visitor guessing. If copying is blocked, say
+          // so and tell them what to do instead.
+          showToast('Press Ctrl+C to copy: ' + text, true);
+        });
+    });
+  });
+}
+
+
+/* ------------------------------------------------------------------ *
+ * 11. SMALL BITS
  * ------------------------------------------------------------------ */
 function initMisc() {
   // Keep the copyright year honest without anyone editing it each January.
@@ -377,4 +489,5 @@ initAccordions();
 initFilters();
 initCounters();
 initCardGlow();
+initCopyButtons();
 initMisc();

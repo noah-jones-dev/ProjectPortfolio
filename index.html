@@ -1098,11 +1098,44 @@
           <span class="contactcard__label">itch.io</span>
           <span class="contactcard__value">NoJo Studios</span>
         </a>
-        <a class="contactcard" href="mailto:noahsjones2023@gmail.com">
-          <span class="contactcard__icon" aria-hidden="true">✉</span>
-          <span class="contactcard__label">Email</span>
-          <span class="contactcard__value">noahsjones2023@gmail.com</span>
-        </a>
+        <!--
+          EMAIL CARD — two actions in one card
+
+          Tapping the card opens the visitor's mail app (mailto:). But plenty
+          of people have no mail client configured, especially on a desktop
+          browser — for them a mailto: link appears to do nothing at all. So
+          there's also a copy button.
+
+          WHY THIS ISN'T A SINGLE <a>: a <button> cannot be nested inside an
+          <a>. Nested interactive elements are invalid HTML and browsers and
+          screen readers handle them unpredictably. So the card is a plain
+          <div> holding two separate controls — the link and the button —
+          each independently focusable and each announced correctly.
+        -->
+        <div class="contactcard contactcard--email">
+          <a class="contactcard__main" href="mailto:noahsjones2023@gmail.com">
+            <span class="contactcard__icon" aria-hidden="true">✉</span>
+            <span class="contactcard__label">Email</span>
+            <span class="contactcard__value">noahsjones2023@gmail.com</span>
+          </a>
+
+          <!--
+            data-copy holds the text to copy, so script.js stays generic —
+            put this attribute on any button and copying just works.
+            aria-label because the button's only content is an icon.
+          -->
+          <button class="copybtn" type="button"
+                  data-copy="noahsjones2023@gmail.com"
+                  aria-label="Copy email address to clipboard">
+            <svg class="copybtn__icon copybtn__icon--copy" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="9" y="9" width="11" height="11" rx="2"/>
+              <path d="M5 15V5a2 2 0 0 1 2-2h10"/>
+            </svg>
+            <svg class="copybtn__icon copybtn__icon--done" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </section>
   </main>
@@ -1111,6 +1144,17 @@
     <p>© <span id="year">2026</span> Noah Jones · Built with plain HTML, CSS &amp; JavaScript</p>
     <a href="#top" class="footer__top">Back to top ↑</a>
   </footer>
+
+  <!--
+    TOAST — the "Copied!" message
+    Empty until JavaScript writes into it.
+
+    role="status" + aria-live="polite" is what makes a screen reader announce
+    the text when it changes. Without it the confirmation would be purely
+    visual, and a non-sighted visitor would have no idea the copy worked.
+    "polite" waits for a natural pause rather than interrupting.
+  -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- defer = download now, run after the HTML is parsed. Keeps the page fast. -->
   <script src="script.js" defer></script>

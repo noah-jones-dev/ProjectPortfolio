@@ -20,6 +20,8 @@ Captured from a real Chromium browser at 1440×900 (desktop) and 390×844
 | `12-mobile-ip12-hero` | 390px (iPhone 12) |
 | `13-mobile-se-work` | 320px Work section — 44px filter chips |
 | `13-mobile-ip12-work` | 390px Work section |
+| `14-mobile-copy-toast` | 320px — "Copied" toast after tapping the copy button |
+| `15-copy-toast-dark` | Desktop — email card copied, toast visible |
 
 `-dark` and `-light` suffixes are the two themes.
 

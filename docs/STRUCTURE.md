@@ -397,6 +397,84 @@ image needs `alt` text describing it.
 
 ---
 
+## 8b. Copy to clipboard — more subtle than it looks
+
+The email card does two things: tapping it opens your mail app, and a small
+button copies the address. Four things had to be got right.
+
+### Why it isn't one big link
+
+A `<button>` cannot be nested inside an `<a>`. Nested interactive elements are
+invalid HTML, and browsers and screen readers handle them unpredictably — you
+get one control where you meant two, and keyboard focus order goes strange.
+
+So the email card is a plain `<div>` holding two separate controls: an `<a>` for
+the mailto and a `<button>` for the copy. The other three contact cards are
+still a single `<a>`, because they only do one thing.
+
+**Rule:** one interactive element per interactive element. If a card needs two
+actions, the card itself stops being the control.
+
+### Why the mailto doesn't fire when you copy
+
+The copy button sits inside the card, so a click on it would bubble up and also
+trigger the link:
+
+```js
+event.preventDefault();    // don't follow the link
+event.stopPropagation();   // don't let the click bubble any further
+```
+
+Without these two lines, copying the address also launches your mail client —
+which is exactly what someone pressing "copy" is trying to avoid.
+
+### Why there are two copy implementations
+
+```js
+if (navigator.clipboard && window.isSecureContext) {
+  return navigator.clipboard.writeText(text);
+}
+// ...otherwise fall back to a hidden textarea + execCommand('copy')
+```
+
+`navigator.clipboard` is the modern API, but it only exists in a **secure
+context** — `https://` or `localhost`. Open the page from a `file://` path or
+serve it over plain `http://` and it's simply `undefined`. The deprecated
+`execCommand('copy')` still works essentially everywhere, so it's the fallback.
+
+Note the fallback puts its temporary `<textarea>` off-screen with
+`position: fixed; top: -1000px` rather than `display: none` — **the browser
+cannot select text inside an element it isn't rendering.** It's removed in a
+`finally` block so it's cleaned up even if the copy throws.
+
+Both approaches also require a genuine user gesture. Browsers block clipboard
+writes that aren't tied to a real click, so a page can't silently hijack what
+you've copied.
+
+### Why the confirmation is a toast, not an alert
+
+`alert()` freezes the entire page until dismissed, can't be styled, and reads as
+a browser error rather than a confirmation.
+
+The toast is a fixed-position element that slides up, waits, and slides away. It
+uses `pointer-events: none` so it can never block a click on whatever it covers,
+and it animates only `transform` and `opacity`.
+
+The accessibility half matters as much as the visual:
+
+```html
+<div class="toast" role="status" aria-live="polite"></div>
+```
+
+Writing text into a live region is what makes a screen reader announce it. A
+purely visual confirmation tells a non-sighted visitor nothing.
+
+And the failure case is handled — if both copy methods fail, the toast says
+*"Press Ctrl+C to copy: …"* rather than silently doing nothing. **Never leave
+someone guessing whether a control worked.**
+
+---
+
 ## 9. Performance
 
 The whole site is roughly 60 KB of HTML, CSS, and JS. For comparison, a single

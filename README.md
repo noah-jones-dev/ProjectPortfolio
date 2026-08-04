@@ -194,6 +194,21 @@ Change the `data-count` attribute, not the `0` between the tags:
 <dd data-count="9">0</dd>
 ```
 
+### Add another copy-to-clipboard button
+
+The copy logic is wired to **any** element carrying a `data-copy` attribute, so
+no JavaScript changes are needed:
+
+```html
+<button class="copybtn" type="button"
+        data-copy="the text to copy"
+        aria-label="Copy something to clipboard">…</button>
+```
+
+It shows a toast, swaps to a tick for a moment, and falls back to the legacy
+copy method when the modern Clipboard API isn't available (e.g. over plain
+`http://` or from a `file://` path).
+
 ### Add a nav link
 
 Add an `<a href="#yourSection">` inside `.nav__links`. Smooth scrolling and the

@@ -1140,6 +1140,128 @@ code {
 .contactcard:hover .contactcard__label,
 .contactcard:hover .contactcard__value { color: #fff; }
 
+/* ---- Email card: a link plus a copy button ---- */
+
+/*
+  The email card is a <div> rather than an <a> (a button can't be nested in a
+  link), so the inner <a> has to re-create the column layout the card itself
+  provides for the other three.
+*/
+.contactcard--email { position: relative; }
+
+.contactcard__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-decoration: none;
+  color: inherit;
+  /* Fill the card so the whole area opens the mail app, not just the text. */
+  flex: 1;
+}
+
+.copybtn {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 2;                /* above .contactcard__main */
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: transform var(--dur) var(--ease-pop),
+              color var(--dur) var(--ease),
+              border-color var(--dur) var(--ease),
+              background-color var(--dur) var(--ease);
+}
+.copybtn:hover {
+  color: var(--text);
+  border-color: var(--border-lit);
+  transform: translateY(-2px);
+}
+.copybtn:active { transform: scale(0.9); }
+
+/* Keep the button readable once the card's gradient wash slides up. */
+.contactcard:hover .copybtn {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+
+.copybtn__icon {
+  grid-area: 1 / 1;          /* stack both icons in the same cell */
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--dur) var(--ease-pop),
+              opacity var(--dur) var(--ease);
+}
+/* Swap copy icon for a tick while .is-copied is on the button. */
+.copybtn__icon--done            { opacity: 0; transform: scale(0.4); }
+.copybtn.is-copied .copybtn__icon--copy { opacity: 0; transform: scale(0.4); }
+.copybtn.is-copied .copybtn__icon--done { opacity: 1; transform: scale(1); }
+.copybtn.is-copied {
+  color: #fff;
+  border-color: transparent;
+  background: var(--c3);
+}
+
+/* ---- Toast ---- */
+
+/*
+  Fixed to the bottom of the viewport, hidden by default. Only transform and
+  opacity animate, so it composites on the GPU.
+
+  pointer-events: none means it can never block a click on whatever is
+  underneath it — important for something that floats over the page.
+*/
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.15rem;
+  border: 1px solid var(--border-lit);
+  border-radius: 999px;
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  white-space: nowrap;
+  max-width: calc(100vw - 2rem);
+  opacity: 0;
+  transform: translate(-50%, 130%);
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease),
+              transform var(--dur-slow) var(--ease-pop);
+}
+.toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+/* A thin gradient edge so it reads as part of the site, not a browser alert. */
+.toast::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--grad);
+  flex: none;
+}
+.toast--error::before { background: #F59E0B; }
+
 
 /* ============================ 11. FOOTER ============================ */
 
@@ -1351,6 +1473,10 @@ code {
   /* The scroll hint is decorative, but it IS a link — give it a real
      tap area via padding rather than growing the drawn mouse shape. */
   .scroll-cue { padding: 0.4rem 0.75rem; }
+
+  /* The copy button is 36px on desktop, which is fine for a mouse but
+     under the comfortable minimum for a fingertip. */
+  .copybtn { width: 44px; height: 44px; top: 0.7rem; right: 0.7rem; }
 
   .chip, .btn {
     display: inline-flex;
