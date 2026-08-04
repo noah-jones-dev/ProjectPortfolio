@@ -1,0 +1,490 @@
+# How this site is built
+
+A walkthrough of the portfolio, written for someone who hasn't built a website
+before. Every section explains *what* the code does and *why* it was done that
+way — including the places where the obvious approach is the wrong one.
+
+---
+
+## 1. The three-file split
+
+```
+index.html    STRUCTURE + CONTENT   what the page says
+styles.css    PRESENTATION          what it looks like
+script.js     BEHAVIOUR             what happens when you interact
+```
+
+This is called **separation of concerns**, and it's the oldest good idea on the
+web. You *can* put styles and scripts directly inside your HTML. It works. It
+also means that six months from now, changing one colour requires hunting
+through hundreds of lines of markup.
+
+The test for whether you've got the split right: *could you completely redesign
+this site by editing only `styles.css`?* Here, the answer is yes.
+
+**Rule of thumb:** if you're writing `style="..."` directly on an HTML element,
+stop and ask whether it belongs in the stylesheet. It almost always does.
+
+---
+
+## 2. The page skeleton
+
+```
+<header class="nav">        sticky navigation + theme toggle
+<main id="main">
+  <section class="hero">    name, tagline, buttons, live stat counters
+  <section id="about">      bio + quick-facts panel
+  <section id="work">       filter chips + 8 project cards
+  <section id="games">      2 game cards
+  <section id="skills">     6 skill groups
+  <section id="contact">    4 contact cards
+</main>
+<footer class="footer">
+```
+
+### Why semantic tags matter
+
+Notice there are almost no plain `<div>`s in that outline. It's `<header>`,
+`<main>`, `<section>`, `<article>`, `<footer>`, `<nav>`.
+
+A `<div>` means nothing. It's a generic box. `<section>` and `<article>` tell
+the browser, search engines, and screen readers *what a chunk of the page is*.
+
+This is not cosmetic:
+
+- **Screen readers** let blind users jump directly between landmarks. With
+  `<div>` soup, there's nothing to jump between — they have to hear the whole
+  page top to bottom.
+- **Search engines** weight content in semantic containers more confidently.
+- **Future you** can read the outline and understand the page instantly.
+
+**Best practice:** reach for the tag that describes the meaning. Use `<div>`
+only when you genuinely just need a box to hang styling on.
+
+### One `<h1>` per page
+
+The page has exactly one `<h1>` (my name), then `<h2>` for each section, `<h3>`
+for cards, `<h4>` inside detail panels. Headings form an outline — like a table
+of contents.
+
+**The mistake to avoid:** picking a heading level because of how big it looks.
+If `<h2>` is too big, make it smaller in CSS. Never skip from `<h1>` to `<h4>`
+to get the size you want — you break the outline for everyone navigating by it.
+
+---
+
+## 3. Design tokens: why theming is easy here
+
+At the top of `styles.css`:
+
+```css
+:root {
+  --bg:   #0B0A10;
+  --text: #F2F0F7;
+  --c1:   #FF2E97;   /* magenta */
+  --c2:   #00E5FF;   /* cyan    */
+  --c3:   #7C3AED;   /* violet  */
+}
+```
+
+These are **CSS custom properties** (variables). Everything below references
+them — `background: var(--bg)`, never `background: #0B0A10`.
+
+Light mode is then just the *same variable names with different values*:
+
+```css
+:root[data-theme="light"] {
+  --bg:   #FBF9FF;
+  --text: #171221;
+  --c1:   #D6157E;
+  ...
+}
+```
+
+Flip `data-theme` on the `<html>` element and every colour on the page changes
+at once. No JavaScript touches individual elements. That's the payoff of never
+hardcoding a colour.
+
+### The trap: neon colours don't survive on white
+
+The dark theme uses cyan `#00E5FF`. On a near-black background it's crisp. On
+white it's nearly invisible — there isn't enough contrast.
+
+So the light theme deepens every accent: cyan becomes `#0286A6`, magenta becomes
+`#D6157E`. Same *hue*, much darker.
+
+**Best practice:** WCAG (the accessibility standard) asks for a contrast ratio of
+at least **4.5:1** between normal text and its background. Bright, saturated
+colours on white almost always fail. Test with your browser's DevTools — inspect
+any text, and the colour picker shows the contrast ratio and whether it passes.
+
+**The bigger principle:** never use colour as the *only* way to communicate
+something. Around 1 in 12 men has some form of colour blindness. On this site,
+the filter chips don't just change colour when active — they change background
+weight and gain a shadow too.
+
+---
+
+## 4. Layout: Flexbox vs Grid
+
+Both are used, for different jobs.
+
+**Flexbox** — one direction, content-sized. The nav bar, tag lists, button rows:
+
+```css
+.tags { display: flex; flex-wrap: wrap; gap: 0.38rem; }
+```
+
+**Grid** — two dimensions, or when you want equal columns:
+
+```css
+.grid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.15rem;
+}
+```
+
+That one line is the entire responsive card layout. Read it as: *"fit as many
+columns as you can, each at least 320px wide, sharing leftover space equally."*
+
+Three columns on a desktop, two on a tablet, one on a phone — with **no media
+queries at all**. The browser does the maths.
+
+### `auto-fit` vs `auto-fill` — a real bug I hit
+
+The Games section has only two cards. With `auto-fill`, the browser reserves
+empty column slots, so the two cards sat in the left two-thirds with a dead gap
+on the right. `auto-fit` *collapses* the empty tracks, letting the real cards
+stretch to fill the row.
+
+**Rule:** `auto-fit` when you want items to expand and fill; `auto-fill` when
+you want a consistent grid even if it's half empty.
+
+### Equal-height cards
+
+The grid uses `align-items: stretch` so every card in a row is the same height,
+combined with `margin-top: auto` on the Details button to pin it to the bottom.
+That's what makes the buttons line up in a neat row instead of floating at
+whatever height each card's text happened to end at.
+
+---
+
+## 5. The accordion — and the trick that makes it animate
+
+You asked for expandable detail panels, and they're the most technically
+interesting part of the build.
+
+**The problem:** CSS cannot animate `height: auto`. It's the single most common
+"why doesn't this work" in web development. The browser needs two concrete
+numbers to interpolate between, and `auto` isn't a number.
+
+**The workaround** (a genuinely modern CSS trick):
+
+```css
+.accordion__panel {
+  display: grid;
+  grid-template-rows: 0fr;                 /* collapsed */
+  transition: grid-template-rows 420ms;
+}
+.card.is-open .accordion__panel {
+  grid-template-rows: 1fr;                 /* expanded */
+}
+.accordion__inner { overflow: hidden; }
+```
+
+Grid *fractions* are numbers, so `0fr → 1fr` animates smoothly — and the content
+still sizes itself naturally. No JavaScript measuring heights, no hardcoded
+pixel values that break when you edit the text.
+
+### Making it work for screen readers
+
+The visual chevron rotating is meaningless if you can't see it. So the button
+carries state in markup:
+
+```html
+<button class="accordion__trigger" aria-expanded="false" aria-controls="d-counter">
+```
+
+- `aria-expanded` — JavaScript flips this to `"true"` on open. A screen reader
+  announces "expanded" / "collapsed".
+- `aria-controls` — points at the `id` of the panel it opens.
+
+**And a subtle one:** when the panel is collapsed, its links are still in the
+DOM. Without care, a keyboard user tabbing through the page would land on
+invisible links inside closed panels — deeply confusing. The fix is
+`visibility: hidden` on the collapsed inner wrapper, which removes it from the
+tab order while still permitting the height transition.
+
+**Best practice:** it must be a real `<button>`. A `<div>` with a click handler
+isn't focusable, doesn't respond to Enter or Space, and is invisible to
+assistive tech. Native elements give you all of that free.
+
+---
+
+## 6. Progressive enhancement
+
+The detail panels are collapsed by JavaScript. So what happens if JavaScript
+fails to load?
+
+Without a fallback: the panels stay collapsed, the buttons do nothing, and the
+GitHub links *inside* those panels become permanently unreachable.
+
+The fix is in `index.html`:
+
+```html
+<noscript>
+  <style>
+    .accordion__panel  { display: block !important; }
+    .accordion__trigger { display: none !important; }
+  </style>
+</noscript>
+```
+
+No JavaScript? Every panel is simply open and the toggle buttons disappear. The
+content is always reachable.
+
+**The principle:** build so the content works first, then layer enhancements on
+top. JavaScript should make a working page *nicer*, not be the thing that makes
+it work at all.
+
+---
+
+## 7. Animation
+
+You chose "playful but tasteful," which mostly means knowing what *not* to
+animate.
+
+### Only animate `transform` and `opacity`
+
+Rendering a frame has stages: **layout** (where things go) → **paint** (what
+colour) → **composite** (stack the layers).
+
+- Animating `width`, `height`, `top`, `margin` → triggers **layout** → the
+  browser recalculates the position of everything. Expensive. Janky.
+- Animating `transform` and `opacity` → **composite only** → handled by the GPU.
+  Smooth, essentially free.
+
+So cards lift with `transform: translateY(-6px)`, never `top: -6px`. Identical
+look, completely different performance.
+
+### Easing is where "cheap" or "polished" is decided
+
+```css
+--ease:     cubic-bezier(0.22, 0.61, 0.36, 1);   /* smooth settle  */
+--ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);   /* slight bounce  */
+```
+
+`linear` motion feels robotic — nothing in the physical world moves at constant
+speed. The `1.56` in the second curve overshoots slightly past the target and
+settles back. That tiny bounce is what makes the icons and chevron feel alive.
+
+### Duration
+
+Interface animation lives between **150ms and 400ms**. Under 100ms reads as an
+instant jump; over 500ms and people feel like they're waiting on the site.
+Hovers are fast (140ms), panel expansions slower (420ms) because more is moving.
+
+### The counters
+
+The hero numbers count up using `requestAnimationFrame` with an easing curve:
+
+```js
+const eased = 1 - Math.pow(1 - progress, 3);   // easeOutCubic
+```
+
+Fast at first, gently settling. `requestAnimationFrame` syncs to the display's
+refresh rate — the right tool for this. `setInterval` would drift and stutter.
+
+### Reveal on scroll
+
+Sections fade up as they enter the viewport, using `IntersectionObserver`:
+
+```js
+const observer = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-visible');
+    obs.unobserve(entry.target);          // reveal ONCE
+  });
+});
+```
+
+The old way was listening to every scroll event and calculating positions —
+which fires hundreds of times a second and makes scrolling stutter.
+`IntersectionObserver` lets the browser do it natively and tells you only when
+something actually crosses the threshold.
+
+Note `obs.unobserve()`. Without it, elements re-animate every time you scroll
+past. Charming once, irritating by the third time.
+
+---
+
+## 8. Accessibility — the parts that matter most
+
+This is where portfolio sites usually fall down, and it's very visible to
+anyone technical looking at your work.
+
+### Respect reduced motion
+
+Some people get genuine motion sickness from drifting, parallaxing interfaces,
+and set an OS-level preference saying so. Honouring it is not optional:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .blob   { animation: none; }
+}
+```
+
+Critically, `.reveal` is reset to visible. Elements start at `opacity: 0` and are
+revealed by transition — if you only disabled transitions, content would stay
+invisible forever. **Disabling animation must never hide content.**
+
+`script.js` checks the same preference and skips the counter animation and
+cursor-tracking entirely.
+
+### Never remove focus outlines
+
+```css
+:focus-visible {
+  outline: 3px solid var(--c2);
+  outline-offset: 3px;
+}
+```
+
+You will find advice online saying `outline: none` to "clean up" the design.
+**Don't.** Keyboard users navigate entirely by that ring; removing it makes the
+site unusable for them. If you dislike the default, restyle it — as here.
+
+`:focus-visible` (rather than `:focus`) is the modern refinement: the ring shows
+for keyboard navigation but not on mouse clicks. Best of both.
+
+### Announce changes that only happen visually
+
+When you click a filter chip, cards disappear. A sighted user sees it instantly.
+A screen reader user gets *nothing* — the page silently changed.
+
+```html
+<p class="filter-status" role="status" aria-live="polite"></p>
+```
+
+JavaScript writes "Showing 2 projects in this category." into it, and
+`aria-live="polite"` makes the screen reader announce it at the next natural
+pause.
+
+### The skip link
+
+The first focusable element on the page:
+
+```html
+<a class="skip-link" href="#main">Skip to content</a>
+```
+
+Invisible until focused. Keyboard users otherwise have to tab through every nav
+link on every visit. One line of HTML, enormous quality-of-life difference.
+
+### Alt text and decoration
+
+The floating background blobs are `aria-hidden="true"` — they're pure
+decoration, and announcing them would be noise. Conversely, any *meaningful*
+image needs `alt` text describing it.
+
+**The rule:** decorative → hide it from assistive tech. Meaningful → describe it.
+
+---
+
+## 9. Performance
+
+The whole site is roughly 60 KB of HTML, CSS, and JS. For comparison, a single
+unoptimised photo is often 2 MB. The main things that keep it fast:
+
+- **No frameworks.** React would add ~140 KB before a single word of your
+  content. For a portfolio, that's a lot of cost for no benefit.
+- **No web fonts.** The site uses the system font stack, so text renders
+  instantly with zero download. A custom font is typically 100 KB+ and causes
+  the flash of invisible text you see on slow sites.
+- **`defer` on the script.** `<script src="script.js" defer>` downloads the file
+  in parallel with parsing the HTML, then runs it after. Without `defer`, the
+  browser stops parsing and waits.
+- **`passive: true` on scroll listeners.** Promises the browser you won't call
+  `preventDefault()`, so it can scroll without waiting for your code.
+
+### The one inline script
+
+There's a small script in `<head>` that runs *before* anything renders. This is
+the exception that proves the rule about keeping JS in its own file.
+
+If theme loading waited for `script.js`, a visitor who chose light mode would
+see a dark flash on every page load. Setting `data-theme` before first paint
+eliminates it. This pattern is sometimes called the "FOUC killer" (flash of
+unstyled content).
+
+---
+
+## 10. Mobile
+
+The CSS is written **mobile-considerate**: fluid units first, media queries only
+where layout genuinely must change.
+
+```css
+font-size: clamp(3.2rem, 13vw, 8.5rem);
+```
+
+`clamp(minimum, preferred, maximum)` — never smaller than `3.2rem`, never larger
+than `8.5rem`, otherwise 13% of viewport width. One line replaces about four
+media queries, and it scales smoothly rather than jumping at breakpoints.
+
+Only three real breakpoints exist (880px, 680px, 420px), and each is placed
+where *the design breaks*, not at named device sizes. Chasing "the iPhone size"
+is a losing game — there are hundreds. Resize the window until it looks wrong,
+then add a breakpoint there.
+
+Touch targets stay at least ~44px — Apple's and Google's recommended minimum for
+a comfortable finger tap.
+
+The cursor-following card glow is skipped entirely on touch devices:
+
+```js
+if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+```
+
+Hover effects don't exist on touchscreens, and listening for pointer moves there
+just wastes battery.
+
+---
+
+## 11. What I'd do next
+
+Honest assessment of what's missing:
+
+1. **Real game screenshots.** The game cards currently use gradient placeholders
+   with an emoji. Actual captures would be the single biggest visual upgrade —
+   this is where a portfolio earns attention.
+2. **Compress any images you add.** Export as WebP, keep them under ~200 KB, and
+   always set `width` and `height` attributes so the page doesn't jump around as
+   they load.
+3. **A custom domain.** GitHub Pages supports it and it reads more professional
+   than a `github.io` URL.
+4. **Verify the game descriptions.** They were assembled from search results
+   because itch.io was unreachable from the build environment — worth checking
+   against your actual store pages.
+
+---
+
+## Quick reference — the habits worth keeping
+
+| Do | Don't |
+|---|---|
+| Semantic tags (`<section>`, `<article>`, `<nav>`) | `<div>` for everything |
+| CSS variables for colour | Hardcoded hex codes scattered about |
+| Animate `transform` / `opacity` | Animate `width` / `height` / `top` |
+| Real `<button>` elements | `<div onclick="...">` |
+| Style the focus ring | `outline: none` |
+| Honour `prefers-reduced-motion` | Force animation on everyone |
+| `clamp()` and fluid units | A media query for every screen size |
+| Breakpoints where the design breaks | Breakpoints named after phones |
+| Content works without JS | JS required to read anything |
