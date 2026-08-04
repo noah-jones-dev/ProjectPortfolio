@@ -16,7 +16,8 @@
      11. Footer
      12. Reveal-on-scroll   — the fade-up animation states
      13. Reduced motion     — accessibility override, MUST stay last-ish
-     14. Responsive         — the three breakpoints
+     14. Responsive         — the four breakpoints
+     15. Touch devices      — sticky-hover fix, 44px targets, safe areas
 
    THE BIG IDEA
      Nothing below section 1 hardcodes a colour. Everything references a
@@ -1205,26 +1206,203 @@ code {
 
 /* ============================ 14. RESPONSIVE ============================ */
 
+/*
+  Breakpoints are placed where THIS design breaks, not at named device sizes.
+  Chasing "the iPhone width" is a losing game — there are hundreds, and they
+  change every year. Resize the window until something looks wrong, then add
+  a breakpoint there. That's how these four were chosen.
+
+  Everything else scales continuously via clamp(), so these only handle the
+  changes that genuinely need a hard switch (column counts, nav layout).
+*/
+
+/* --- Tablet: the About panel no longer has room beside the prose --- */
 @media (max-width: 880px) {
   .about { grid-template-columns: 1fr; }
 }
 
+/* --- Phone: single column, bigger tap targets --- */
 @media (max-width: 680px) {
   html { scroll-padding-top: 76px; }
 
   /* The text label goes; the gradient mark stays as the logo. */
   .nav__brandtext { display: none; }
   .nav__links { gap: 0; }
-  .nav__links a { padding: 0.45rem 0.55rem; font-size: 0.85rem; }
+
+  /* min-height, not padding alone: guarantees the 44px tap target even
+     though the text inside is small. See the touch section below. */
+  .nav__links a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.85rem;
+  }
 
   .hero { min-height: auto; padding-top: 2.5rem; }
   .scroll-cue { display: none; }
   .stats { grid-template-columns: repeat(2, 1fr); }
 
   .grid, .grid--games { grid-template-columns: 1fr; }
+
+  /* Big blur radii are expensive to composite on phone GPUs. */
   .blob { filter: blur(65px); }
 }
 
-@media (max-width: 420px) {
-  .nav__links a { padding: 0.4rem 0.4rem; font-size: 0.78rem; }
+/*
+  --- Small phones (<=430px): the nav wraps to two rows ---
+
+  THE BUG THIS FIXES: at 320px the nav needed 378px — brand (34) + links
+  (251) + toggle (42) + gaps + padding. With flex-wrap: nowrap the toggle
+  was pushed off-screen and the whole PAGE scrolled sideways.
+
+  Rather than shrinking the text until it's unreadable, the nav now wraps:
+  brand and theme toggle share row one, the links spread across row two.
+  order: 3 moves the links after the toggle visually without touching the
+  HTML, and margin-right: auto on the brand pushes the toggle to the right.
+*/
+@media (max-width: 430px) {
+  .nav {
+    flex-wrap: wrap;
+    row-gap: 0.3rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.45rem;
+  }
+  .nav__links {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .nav__links a { padding: 0.45rem 0.35rem; font-size: 0.8rem; }
+  .nav__links a.is-current::after { left: 0.35rem; right: 0.35rem; }
+
+  /* The nav is two rows tall now, so anchor jumps need more clearance. */
+  html { scroll-padding-top: 104px; }
+}
+
+/*
+  --- Short landscape screens ---
+  Keyed to HEIGHT, not width. A phone turned sideways is ~844px wide, so
+  width-based rules treat it like a small laptop — and 13vw makes the hero
+  title ~110px tall on a 390px-tall screen, filling the entire display.
+*/
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero {
+    min-height: auto;
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
+  }
+  .hero__title { font-size: clamp(2.2rem, 7vw, 4rem); }
+  .scroll-cue { display: none; }
+}
+
+
+/* ============================ 15. TOUCH DEVICES ============================ */
+
+/*
+  Phones and tablets need three things desktop doesn't.
+*/
+
+/* 1. NO STICKY HOVER.
+      Touchscreens have no cursor, so a tap fires :hover — and it STAYS
+      applied until you tap something else. Cards stay lifted, contact
+      cards keep their gradient wash. It looks broken.
+
+      (hover: none) targets devices that cannot hover at all, so desktop
+      and hybrid laptops are unaffected. The :active states still fire on
+      press, so tapping keeps its feedback. */
+@media (hover: none) {
+  .card:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--border);
+  }
+  .card:hover .card__glow      { opacity: 0; }
+  .card:hover .card__icon      { transform: none; }
+  .card:hover .card__art span  { transform: none; }
+
+  .contactcard:hover           { transform: none; box-shadow: none; border-color: var(--border); }
+  .contactcard:hover::before   { opacity: 0; transform: translateY(100%); }
+  .contactcard:hover .contactcard__icon  { background: var(--surface-2); border-color: var(--border); color: inherit; }
+  .contactcard:hover .contactcard__label { color: var(--text-dim); }
+  .contactcard:hover .contactcard__value { color: inherit; }
+
+  .stat:hover, .skillgroup:hover, .chip:hover, .theme-toggle:hover,
+  .btn--primary:hover, .btn--ghost:hover, .footer__top:hover { transform: none; }
+  .pills li:hover { transform: none; color: var(--text-dim); border-color: var(--border); }
+  .nav__brand:hover .nav__mark { transform: none; }
+  .btn:hover .btn__arrow { transform: none; }
+}
+
+/* 2. TAP TARGETS OF AT LEAST 44px.
+      Apple and Google both put the comfortable minimum around 44px. Smaller
+      than that and people miss, or hit the neighbouring control. Text size
+      stays as designed; only the touchable box grows. */
+@media (pointer: coarse) {
+  .nav__links a,
+  .chip,
+  .accordion__trigger,
+  .btn { min-height: 44px; }
+
+  /* Nav links are sized by their text, so short ones ("Work") fall under
+     44px on width even when the height is right. Both axes matter. */
+  .nav__links a { min-width: 44px; justify-content: center; }
+
+  /* The scroll hint is decorative, but it IS a link — give it a real
+     tap area via padding rather than growing the drawn mouse shape. */
+  .scroll-cue { padding: 0.4rem 0.75rem; }
+
+  .chip, .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav__brand   { min-height: 44px; min-width: 44px; }
+  .theme-toggle { width: 44px; height: 44px; }
+
+  /* Standalone links need the same treatment as buttons. */
+  .footer__top {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .about__facts .btn { width: 100%; }
+
+  /*
+    NOT enlarged: the inline links inside sentences (.section__foot a).
+    WCAG's target-size rule explicitly exempts targets embedded in a block
+    of text — padding them to 44px would wreck the line spacing around
+    them. Size minimums apply to standalone controls, not prose links.
+  */
+
+  /* Slightly roomier spacing between adjacent chips so fingers don't
+     bridge two of them. */
+  .filters { gap: 0.6rem; }
+}
+
+/* 3. NO GREY TAP FLASH.
+      Mobile browsers paint a translucent box over whatever you tap. We
+      already have our own :active squish, so the default just muddies it.
+      Only safe to remove BECAUSE there's a visible replacement. */
+a, button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*
+  SAFE AREA INSETS — notches and home indicators.
+  On phones with a notch or rounded corners, the browser reports the full
+  screen but part of it is physically obscured. env(safe-area-inset-*)
+  exposes the unusable margin; max() keeps our normal padding when the inset
+  is 0 (every non-notched device). Without this, the theme toggle can sit
+  under a rounded corner in landscape.
+*/
+@supports (padding: max(0px)) {
+  .nav {
+    padding-left:  max(var(--gutter), env(safe-area-inset-left));
+    padding-right: max(var(--gutter), env(safe-area-inset-right));
+  }
+  .footer {
+    padding-bottom: max(3rem, env(safe-area-inset-bottom));
+  }
 }

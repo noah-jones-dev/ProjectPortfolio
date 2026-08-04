@@ -289,6 +289,27 @@ Something is overriding `box-sizing: border-box`.
 **Text is tiny on mobile.**
 The `<meta name="viewport">` tag was removed from `<head>`.
 
+**The page scrolls sideways on a phone.**
+Something is wider than the viewport. Find it in DevTools console:
+
+```js
+document.documentElement.scrollWidth - document.documentElement.clientWidth
+```
+
+Above 0 means overflow. Don't paper over it with `overflow-x: hidden` — and
+never put that on `<html>`, because it can break the sticky nav. Fix the wide
+element. This is what caused the nav to push its theme toggle off-screen at
+320px before the nav was made to wrap.
+
+**A card stays lifted after I tap it on my phone.**
+That's `:hover` sticking, because touchscreens have no cursor to move away.
+The `@media (hover: none)` block in section 15 of `styles.css` resets it — if
+you add a new hover effect, add its reset there too.
+
+**The hero title is enormous when I rotate my phone sideways.**
+`vw` units don't know the screen's height. Size it with a height-keyed media
+query, as the landscape block in section 14 does.
+
 ---
 
 ## Deploying to GitHub Pages (free)
