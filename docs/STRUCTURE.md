@@ -397,6 +397,84 @@ image needs `alt` text describing it.
 
 ---
 
+## 8b. Copy to clipboard — more subtle than it looks
+
+The email card does two things: tapping it opens your mail app, and a small
+button copies the address. Four things had to be got right.
+
+### Why it isn't one big link
+
+A `<button>` cannot be nested inside an `<a>`. Nested interactive elements are
+invalid HTML, and browsers and screen readers handle them unpredictably — you
+get one control where you meant two, and keyboard focus order goes strange.
+
+So the email card is a plain `<div>` holding two separate controls: an `<a>` for
+the mailto and a `<button>` for the copy. The other three contact cards are
+still a single `<a>`, because they only do one thing.
+
+**Rule:** one interactive element per interactive element. If a card needs two
+actions, the card itself stops being the control.
+
+### Why the mailto doesn't fire when you copy
+
+The copy button sits inside the card, so a click on it would bubble up and also
+trigger the link:
+
+```js
+event.preventDefault();    // don't follow the link
+event.stopPropagation();   // don't let the click bubble any further
+```
+
+Without these two lines, copying the address also launches your mail client —
+which is exactly what someone pressing "copy" is trying to avoid.
+
+### Why there are two copy implementations
+
+```js
+if (navigator.clipboard && window.isSecureContext) {
+  return navigator.clipboard.writeText(text);
+}
+// ...otherwise fall back to a hidden textarea + execCommand('copy')
+```
+
+`navigator.clipboard` is the modern API, but it only exists in a **secure
+context** — `https://` or `localhost`. Open the page from a `file://` path or
+serve it over plain `http://` and it's simply `undefined`. The deprecated
+`execCommand('copy')` still works essentially everywhere, so it's the fallback.
+
+Note the fallback puts its temporary `<textarea>` off-screen with
+`position: fixed; top: -1000px` rather than `display: none` — **the browser
+cannot select text inside an element it isn't rendering.** It's removed in a
+`finally` block so it's cleaned up even if the copy throws.
+
+Both approaches also require a genuine user gesture. Browsers block clipboard
+writes that aren't tied to a real click, so a page can't silently hijack what
+you've copied.
+
+### Why the confirmation is a toast, not an alert
+
+`alert()` freezes the entire page until dismissed, can't be styled, and reads as
+a browser error rather than a confirmation.
+
+The toast is a fixed-position element that slides up, waits, and slides away. It
+uses `pointer-events: none` so it can never block a click on whatever it covers,
+and it animates only `transform` and `opacity`.
+
+The accessibility half matters as much as the visual:
+
+```html
+<div class="toast" role="status" aria-live="polite"></div>
+```
+
+Writing text into a live region is what makes a screen reader announce it. A
+purely visual confirmation tells a non-sighted visitor nothing.
+
+And the failure case is handled — if both copy methods fail, the toast says
+*"Press Ctrl+C to copy: …"* rather than silently doing nothing. **Never leave
+someone guessing whether a control worked.**
+
+---
+
 ## 9. Performance
 
 The whole site is roughly 60 KB of HTML, CSS, and JS. For comparison, a single
@@ -438,22 +516,129 @@ font-size: clamp(3.2rem, 13vw, 8.5rem);
 than `8.5rem`, otherwise 13% of viewport width. One line replaces about four
 media queries, and it scales smoothly rather than jumping at breakpoints.
 
-Only three real breakpoints exist (880px, 680px, 420px), and each is placed
-where *the design breaks*, not at named device sizes. Chasing "the iPhone size"
-is a losing game — there are hundreds. Resize the window until it looks wrong,
-then add a breakpoint there.
+Four real breakpoints exist (880px, 680px, 430px, and one keyed to *height*),
+each placed where *the design breaks*, not at named device sizes. Chasing "the
+iPhone size" is a losing game — there are hundreds, and they change yearly.
+Resize the window until it looks wrong, then add a breakpoint there.
 
-Touch targets stay at least ~44px — Apple's and Google's recommended minimum for
-a comfortable finger tap.
+### Three bugs found by actually testing on small screens
 
-The cursor-following card glow is skipped entirely on touch devices:
+Testing at 320px (iPhone SE) turned up problems that were invisible at 390px.
+
+**1. The whole page scrolled sideways.**
+
+The sticky nav is a flex row: brand + links + theme toggle. At 320px it needed
+378px, and with `flex-wrap: nowrap` the toggle was pushed off-screen — dragging
+the entire document with it.
+
+The tempting fix is shrinking the font until it fits. The better one is letting
+the nav wrap:
+
+```css
+@media (max-width: 430px) {
+  .nav        { flex-wrap: wrap; }
+  .nav__links { order: 3; width: 100%; justify-content: space-between; }
+}
+```
+
+Brand and toggle share row one, links spread across row two. `order: 3` moves
+the links visually without touching the HTML.
+
+**Diagnosing this class of bug** — one line in the console tells you whether a
+page overflows, and this is worth remembering:
+
+```js
+document.documentElement.scrollWidth - document.documentElement.clientWidth
+```
+
+Anything above 0 means something is too wide. To find the culprit, loop over
+every element and report any whose `getBoundingClientRect().right` exceeds the
+viewport width.
+
+> Note `body { overflow-x: hidden }` *hides* this symptom without fixing it.
+> Worse, putting `overflow-x: hidden` on `<html>` can silently break
+> `position: sticky`, because an overflow container becomes the scroll context.
+> Fix the element that's too wide.
+
+**2. Hover states stuck after tapping.**
+
+Touchscreens have no cursor, so a tap fires `:hover` — and it *stays* applied
+until you tap elsewhere. Cards sat permanently lifted and glowing.
+
+```css
+@media (hover: none) {
+  .card:hover { transform: none; box-shadow: none; }
+}
+```
+
+`(hover: none)` targets devices that genuinely can't hover, so desktops and
+touch-screen laptops keep their effects. The `:active` states still fire on
+press, so tapping keeps its feedback.
+
+**3. Landscape was keyed off the wrong axis.**
+
+A phone rotated sideways is ~844px wide, so every width-based rule treated it
+like a small laptop. With `font-size: clamp(3.2rem, 13vw, 8.5rem)`, the hero
+title rendered at 110px on a 390px-tall screen — one word filling the display.
+
+The fix keys off height instead:
+
+```css
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero__title { font-size: clamp(2.2rem, 7vw, 4rem); }
+}
+```
+
+**Lesson:** `vw` units know nothing about how tall the screen is. Any time you
+size something large from viewport width, check it in landscape.
+
+### Touch targets
+
+Apple and Google both put the comfortable minimum around **44px**. Below that,
+people miss or hit the neighbour. Only the *touchable box* grows — text size
+stays as designed:
+
+```css
+@media (pointer: coarse) {
+  .nav__links a, .chip, .btn { min-height: 44px; min-width: 44px; }
+}
+```
+
+Both axes matter: a nav link can be 44px tall and still only 34px wide.
+
+One deliberate exception: links inside sentences are left alone. WCAG's
+target-size rule explicitly exempts targets embedded in a block of text, and
+padding them to 44px would wreck the line spacing. Minimums are for standalone
+controls.
+
+### Notches and the tap flash
+
+```css
+.nav {
+  padding-left: max(var(--gutter), env(safe-area-inset-left));
+}
+```
+
+`env(safe-area-inset-*)` reports the physically obscured margin on phones with
+a notch or rounded corners. `max()` keeps normal padding when the inset is 0,
+which is every other device.
+
+Mobile browsers also paint a grey box over whatever you tap. Removing it is
+only safe *because* there's a visible replacement — the `:active` squish:
+
+```css
+a, button { -webkit-tap-highlight-color: transparent; }
+```
+
+### And on the JS side
+
+The cursor-following card glow is skipped entirely on touch:
 
 ```js
 if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 ```
 
-Hover effects don't exist on touchscreens, and listening for pointer moves there
-just wastes battery.
+Listening for pointer moves on a device that has no pointer just wastes battery.
 
 ---
 

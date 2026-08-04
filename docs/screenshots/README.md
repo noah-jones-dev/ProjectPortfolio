@@ -16,5 +16,15 @@ Captured from a real Chromium browser at 1440×900 (desktop) and 390×844
 | `09-mobile-hero` | Mobile landing view |
 | `10-mobile-fullpage` | Entire page on mobile |
 | `11-filter-mobile-category` | Work section filtered to "Mobile automation" |
+| `12-mobile-se-hero` | 320px (iPhone SE) — the nav wrapped to two rows |
+| `12-mobile-ip12-hero` | 390px (iPhone 12) |
+| `13-mobile-se-work` | 320px Work section — 44px filter chips |
+| `13-mobile-ip12-work` | 390px Work section |
+| `14-mobile-copy-toast` | 320px — "Copied" toast after tapping the copy button |
+| `15-copy-toast-dark` | Desktop — email card copied, toast visible |
 
 `-dark` and `-light` suffixes are the two themes.
+
+The 12/13 pair were captured with touch emulation on (`hasTouch`), which is
+what makes the browser report `pointer: coarse` and `hover: none`. Without it
+the touch-specific CSS never applies and the capture is misleading.
