@@ -1,32 +1,76 @@
 /* =========================================================================
    Noah Jones — Portfolio behaviour
    =========================================================================
-   Seven small, independent features. Each one is wrapped in its own
-   function and called at the bottom. If one ever breaks, the others keep
-   working — that is the whole reason for the structure.
 
-     1. Theme toggle       — dark <-> light, remembered
-     2. Sticky nav state   — blur background once scrolled
-     3. Scroll spy         — highlight the nav link you're looking at
-     4. Reveal on scroll   — fade sections in as they arrive
-     5. Accordions         — the chevron "Details" panels
-     6. Project filter     — the category chips
-     7. Count-up stats     — hero numbers ticking up
+   CONTENTS
+     1. initTheme()      dark <-> light toggle, remembered in localStorage
+     2. initNavScroll()  frosted background on the nav once you scroll
+     3. initScrollSpy()  underline the nav link for the section you're in
+     4. initReveal()     fade sections up as they enter the viewport
+     5. initAccordions() the chevron "Details" panels
+     6. initFilters()    the Work category chips
+     7. initCounters()   hero numbers ticking up from zero
+     8. initCardGlow()   feed the cursor position to the CSS card glow
+     9. initMisc()       copyright year
 
-   Style note: "const" everywhere unless a value genuinely changes, and
-   every element lookup is checked before use. Defensive, but it means a
-   single renamed class can't take the whole page down.
+   HOW THIS FILE IS ORGANISED
+     Nine small, INDEPENDENT features, each in its own function, all called
+     at the very bottom. Nothing here depends on anything else here. If one
+     breaks, the other eight keep working — that is the entire reason for
+     the structure, and it's worth copying in your own projects.
+
+   THE DIVISION OF LABOUR WITH CSS
+     JavaScript's job here is almost never to animate anything. It toggles a
+     CLASS, and CSS animates the result:
+
+       script.js:  card.classList.toggle('is-open')
+       styles.css: .card.is-open .accordion__panel { grid-template-rows: 1fr }
+
+     Keeping animation in CSS means the browser can run it on the GPU, and it
+     means you can restyle everything without touching this file. Any class
+     starting `is-` is owned by this file.
+
+   STYLE NOTES
+     - `const` unless a value genuinely changes; never `var`.
+     - Every element lookup is checked before use (`if (!el) return;`).
+       Defensive, but it means one renamed class can't take the page down.
+     - 'use strict' catches silent mistakes like assigning to an undeclared
+       variable, turning them into visible errors.
    ========================================================================= */
 
 'use strict';
 
-/* Does this visitor prefer less movement? Checked once, reused everywhere. */
+/*
+  Does this visitor prefer less movement?
+
+  matchMedia lets JavaScript read the same media queries CSS uses. Some people
+  get genuine motion sickness from drifting, animated interfaces and set an
+  OS-level preference saying so. styles.css section 13 handles the CSS side;
+  this constant lets the JS side skip animation work entirely rather than just
+  running it very fast.
+
+  Checked once at load and reused, because querying it repeatedly in a
+  mousemove handler would be wasteful.
+*/
 const prefersReducedMotion =
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 
 /* ------------------------------------------------------------------ *
  * 1. THEME TOGGLE
+ * ------------------------------------------------------------------
+ * Flips data-theme on <html> between "dark" and "light". That single
+ * attribute is all it takes: styles.css defines a different set of colour
+ * variables under :root[data-theme="light"], so every colour on the page
+ * changes at once. No element is touched individually.
+ *
+ * Three behaviours, in priority order:
+ *   1. A choice saved in localStorage always wins.
+ *   2. Otherwise, follow the operating system's light/dark setting.
+ *   3. Otherwise, dark.
+ *
+ * The initial read happens in the inline <script> in index.html's <head>,
+ * NOT here — see the comment there for why.
  * ------------------------------------------------------------------ */
 function initTheme() {
   const toggle = document.getElementById('themeToggle');
@@ -141,6 +185,22 @@ function initReveal() {
 
 /* ------------------------------------------------------------------ *
  * 5. ACCORDIONS
+ * ------------------------------------------------------------------
+ * The chevron "Details" panels on every project and game card.
+ *
+ * All this does is toggle the .is-open class on the card. The actual
+ * expansion is pure CSS, using a trick worth knowing:
+ *
+ *   CSS cannot animate height: auto. It needs two concrete numbers to
+ *   interpolate between, and "auto" isn't one. The workaround is to make
+ *   the panel a grid and animate its single row from 0fr to 1fr —
+ *   fractions ARE numbers, so they animate, and the content still sizes
+ *   itself naturally. No measuring heights in JavaScript, no hardcoded
+ *   pixel values that break when you edit the text.
+ *
+ * The accessibility half is done here though, because a rotating chevron
+ * means nothing if you can't see it. aria-expanded is what actually tells
+ * a screen reader the panel opened.
  * ------------------------------------------------------------------ */
 function initAccordions() {
   const triggers = Array.from(document.querySelectorAll('.accordion__trigger'));
@@ -171,6 +231,16 @@ function initAccordions() {
 
 /* ------------------------------------------------------------------ *
  * 6. PROJECT FILTER
+ * ------------------------------------------------------------------
+ * Matches each card's data-cat against the clicked chip's data-filter and
+ * hides the ones that don't match.
+ *
+ * Note the click listener is on the CONTAINER, not on each chip. This is
+ * called EVENT DELEGATION: one listener handles all four buttons, and it
+ * would keep working if you added a fifth chip to the HTML without
+ * touching this file. event.target.closest('.chip') finds which chip was
+ * actually clicked (or the nearest chip ancestor, if you hit text inside
+ * one). Fewer listeners, less memory, no re-binding.
  * ------------------------------------------------------------------ */
 function initFilters() {
   const bar = document.getElementById('filters');
@@ -289,7 +359,15 @@ function initMisc() {
 
 
 /* ------------------------------------------------------------------ *
- * GO
+ * GO — start everything
+ * ------------------------------------------------------------------
+ * No DOMContentLoaded wrapper is needed because index.html loads this with
+ * <script src="script.js" defer>. `defer` downloads the file in parallel
+ * with parsing the HTML, then runs it once the document is fully parsed —
+ * so every element these functions look for already exists.
+ *
+ * Without `defer`, the browser would stop parsing the page to fetch and run
+ * this file, and every querySelector below would return null.
  * ------------------------------------------------------------------ */
 initTheme();
 initNavScroll();

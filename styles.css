@@ -1,65 +1,109 @@
 /* =========================================================================
    Noah Jones — Portfolio stylesheet
    =========================================================================
-   Read in this order:
-     1.  Design tokens      — every colour/size lives here, ONCE
-     2.  Reset & base
-     3.  Background blobs
-     4.  Navigation
-     5.  Buttons
-     6.  Hero
-     7.  Section shell
-     8.  Cards + accordion
-     9.  Skills
-     10. Contact
-     11. Footer
-     12. Reveal-on-scroll
-     13. Reduced motion
-     14. Responsive
 
-   THE BIG IDEA: nothing below section 1 hardcodes a colour. Everything
-   references a variable like var(--c1). That's why theme switching is a
-   handful of lines instead of a rewrite.
+   CONTENTS
+     1.  Design tokens      — every colour, size, and timing lives here, ONCE
+     2.  Reset & base       — box model, typography, focus ring, skip link
+     3.  Background blobs   — the drifting colour shapes behind everything
+     4.  Navigation         — sticky header, nav links, theme toggle
+     5.  Buttons            — .btn and its variants
+     6.  Hero               — first screen, gradient name, stat counters
+     7.  Section shell      — shared padding/heading styles + About layout
+     8.  Cards + accordion  — project & game cards, filter chips, expanders
+     9.  Skills             — skill group boxes and pills
+     10. Contact            — contact cards with the gradient hover wash
+     11. Footer
+     12. Reveal-on-scroll   — the fade-up animation states
+     13. Reduced motion     — accessibility override, MUST stay last-ish
+     14. Responsive         — the three breakpoints
+
+   THE BIG IDEA
+     Nothing below section 1 hardcodes a colour. Everything references a
+     variable like var(--c1). That is why the entire light theme is ~15 lines
+     instead of a second stylesheet.
+
+   NAMING CONVENTION (BEM-ish)
+     .card          the component ("block")
+     .card__title   a part inside it ("element", double underscore)
+     .card--game    a variant of it ("modifier", double dash)
+     .is-open       a STATE, toggled by JavaScript
+     Knowing which is which tells you instantly whether a class is styling or
+     behaviour. Anything starting .is- is owned by script.js.
+
+   WHERE TO EDIT WHAT
+     Change colours .............. section 1 only
+     Change animation speed ...... --dur / --dur-slow in section 1
+     Change max page width ....... --maxw in section 1
+     Change card layout .......... .grid in section 8
    ========================================================================= */
 
 
 /* ============================ 1. DESIGN TOKENS ============================ */
 
+/*
+  :root is the <html> element. Variables defined here are inherited by every
+  element on the page, which is what makes them usable anywhere.
+
+  The naming is by ROLE, not by appearance: --surface, not --dark-grey. If a
+  variable were named --dark-grey it would be a lie in light mode. Name things
+  for the job they do and themes stay honest.
+*/
 :root {
   /* ---- Neon Arcade (dark) — the default ---- */
-  --bg:         #0B0A10;
-  --bg-2:       #100E18;
-  --surface:    rgba(255, 255, 255, 0.045);
-  --surface-2:  rgba(255, 255, 255, 0.075);
-  --border:     rgba(255, 255, 255, 0.10);
-  --border-lit: rgba(255, 255, 255, 0.22);
+  --bg:         #0B0A10;   /* page background                          */
+  --bg-2:       #100E18;   /* slightly lifted background, for gradients */
+  --surface:    rgba(255, 255, 255, 0.045);  /* card backgrounds        */
+  --surface-2:  rgba(255, 255, 255, 0.075);  /* tags, pills, insets     */
+  --border:     rgba(255, 255, 255, 0.10);   /* default hairline        */
+  --border-lit: rgba(255, 255, 255, 0.22);   /* the same border, hovered */
 
-  --text:       #F2F0F7;
-  --text-dim:   #A9A2C0;
+  /* Surfaces are translucent WHITE rather than solid grey, so the drifting
+     background blobs tint through them. That's what stops the cards looking
+     flat and is most of the "colourful" feel you see. */
+
+  --text:       #F2F0F7;   /* headings and primary copy */
+  --text-dim:   #A9A2C0;   /* body copy, labels, meta    */
 
   --c1: #FF2E97;   /* hot magenta */
   --c2: #00E5FF;   /* electric cyan */
   --c3: #7C3AED;   /* violet */
 
+  /* The signature gradient, defined once and reused on the logo, the primary
+     button, the hero name, the stat numbers, and the active filter chip.
+     Reusing one gradient everywhere is what makes the site feel like a set. */
   --grad: linear-gradient(100deg, var(--c1), var(--c3) 45%, var(--c2));
 
-  --glow-strength: 0.55;
-  --blob-opacity:  0.40;
+  --glow-strength: 0.55;   /* card hover glow opacity */
+  --blob-opacity:  0.40;   /* background shape opacity */
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
 
   /* ---- Spacing & shape ---- */
-  --radius:    18px;
-  --radius-sm: 11px;
-  --maxw:      1180px;
+  --radius:    18px;       /* cards, panels          */
+  --radius-sm: 11px;       /* small controls, insets */
+  --maxw:      1180px;     /* content column width   */
+
+  /* Page side padding. clamp(min, preferred, max): never tighter than
+     1.15rem on a phone, never wider than 3rem on a large monitor, and 4% of
+     the viewport in between. One line, no media queries. */
   --gutter:    clamp(1.15rem, 4vw, 3rem);
 
   /* ---- Motion ----
-     One place to slow everything down or speed it up. */
-  --dur-fast: 140ms;
-  --dur:      260ms;
-  --dur-slow: 420ms;
-  --ease:      cubic-bezier(0.22, 0.61, 0.36, 1);   /* smooth ease-out    */
-  --ease-pop:  cubic-bezier(0.34, 1.56, 0.64, 1);   /* slight overshoot   */
+     Every transition references these, so this is the single place to slow
+     the whole site down or speed it up.
+
+     Durations: UI animation belongs between 150ms and 400ms. Below ~100ms
+     reads as an instant jump; above ~500ms feels like waiting.
+
+     Easing: linear motion feels robotic — nothing physical moves at a
+     constant speed. The 1.56 in --ease-pop overshoots slightly past the
+     target and settles back; that tiny bounce is what makes the icons and
+     chevrons feel alive rather than mechanical. */
+  --dur-fast: 140ms;   /* colour shifts, small hovers        */
+  --dur:      260ms;   /* the default for most transitions   */
+  --dur-slow: 420ms;   /* accordions, larger movements       */
+  --ease:      cubic-bezier(0.22, 0.61, 0.36, 1);   /* smooth ease-out  */
+  --ease-pop:  cubic-bezier(0.34, 1.56, 0.64, 1);   /* slight overshoot */
 }
 
 /* ---- Candy (light). Same variable NAMES, different values. ----
@@ -89,25 +133,52 @@
 
 /* ============================ 2. RESET & BASE ============================ */
 
+/*
+  border-box means an element's width INCLUDES its padding and border. The
+  browser default (content-box) excludes them, so a 300px box with 20px
+  padding is actually 340px wide — the classic "why is my layout 40px too
+  wide" bug. Setting this on everything is the first line of almost every
+  professional stylesheet.
+*/
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
+  /* Makes clicking a #anchor glide instead of jump. Free, no JavaScript.
+     Section 13 turns this off for people who prefer reduced motion. */
   scroll-behavior: smooth;
-  /* Stops anchor jumps from hiding headings under the sticky nav. */
+
+  /* Without this, clicking a nav link scrolls the section to y=0 — directly
+     underneath the sticky header, hiding its heading. This reserves the
+     header's height. If you change the nav height, change this too. */
   scroll-padding-top: 92px;
+
+  /* Stops iOS Safari inflating text when you rotate to landscape. */
   -webkit-text-size-adjust: 100%;
 }
 
 body {
-  margin: 0;
+  margin: 0;   /* browsers add 8px by default */
   background: var(--bg);
   color: var(--text);
+
+  /* A "system font stack": use whatever good font the OS already has. Zero
+     download, instant render. A custom web font is typically 100KB+ and
+     causes the flash of invisible text you see on slow sites. */
   font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto,
                "Helvetica Neue", Arial, sans-serif;
+
   font-size: 16px;
-  line-height: 1.65;
+  line-height: 1.65;   /* 1.5-1.7 is the readable range for body copy */
+
+  /* The background blobs are deliberately larger than the screen; without
+     this they'd create a horizontal scrollbar. */
   overflow-x: hidden;
+
   -webkit-font-smoothing: antialiased;
+
+  /* Makes the theme switch fade rather than snap. Note it lists specific
+     properties — `transition: all` is a performance trap, because the browser
+     then has to watch every animatable property for changes. */
   transition: background-color var(--dur) var(--ease),
               color var(--dur) var(--ease);
 }
@@ -134,11 +205,20 @@ code {
   border-radius: 6px;
 }
 
-/* One consistent focus ring everywhere. Never remove focus styling —
-   keyboard users navigate entirely by it. */
+/*
+  THE FOCUS RING — do not delete this.
+
+  You will find advice online saying `outline: none` to "clean up" a design.
+  Doing that makes the site unusable for anyone navigating by keyboard, since
+  the ring is the only thing showing where they are. If you dislike the
+  browser default, RESTYLE it — as here — never remove it.
+
+  :focus-visible rather than :focus is the modern refinement: the ring appears
+  for keyboard navigation but not when you click with a mouse. Best of both.
+*/
 :focus-visible {
   outline: 3px solid var(--c2);
-  outline-offset: 3px;
+  outline-offset: 3px;   /* gap so the ring doesn't touch the element */
   border-radius: 6px;
 }
 
@@ -226,7 +306,16 @@ code {
               backdrop-filter var(--dur) var(--ease);
 }
 
-/* JS adds .is-scrolled once you leave the top of the page. */
+/*
+  script.js adds .is-scrolled once you scroll past 12px. At the very top the
+  nav is fully transparent so the hero reads as one clean surface; as soon as
+  content starts sliding underneath it, the frosted background appears to
+  keep the links legible.
+
+  color-mix() builds a translucent version of the current --bg, so this works
+  in both themes from one rule. backdrop-filter blurs whatever is BEHIND the
+  element — the frosted-glass effect. The -webkit- line is for Safari.
+*/
 .nav.is-scrolled {
   background: color-mix(in srgb, var(--bg) 78%, transparent);
   backdrop-filter: blur(14px) saturate(150%);
@@ -322,6 +411,16 @@ code {
 
 /* ============================ 5. BUTTONS ============================ */
 
+/*
+  BUTTONS
+  .btn is the base; .btn--primary / .btn--ghost / .btn--small are modifiers
+  layered on top. Applying two classes (class="btn btn--primary") rather than
+  writing a separate complete style for each variant means padding, radius,
+  and transitions are defined once.
+
+  --btn-pad is a variable scoped to .btn itself, which is how .btn--small
+  changes the padding with a single line instead of overriding the shorthand.
+*/
 .btn {
   --btn-pad: 0.82rem 1.5rem;
   position: relative;
@@ -365,7 +464,17 @@ code {
   background: var(--surface-2);
 }
 
-/* The squish. Fires on mouse-down, so clicking feels physical. */
+/*
+  THE SQUISH. :active applies while the mouse button is held down, so the
+  button compresses under the press and springs back on release. This is the
+  cheapest possible trick for making an interface feel physical rather than
+  like a picture of a button.
+
+  Note every hover/active effect here uses `transform`, never `top` or
+  `width`. transform is GPU-composited (essentially free); changing width or
+  position forces the browser to recalculate the layout of the page on every
+  single frame, which is what causes janky animation.
+*/
 .btn:active { transform: scale(0.955); }
 
 .btn--small { --btn-pad: 0.58rem 1.1rem; font-size: 0.87rem; }
@@ -411,8 +520,17 @@ code {
 }
 .hero__line { display: block; }
 
-/* Animated gradient text. The trick: paint the gradient on the background,
-   clip it to the glyph shapes, then make the text itself transparent. */
+/*
+  ANIMATED GRADIENT TEXT — three steps that only work together:
+    1. background: <gradient>     paint a gradient on the element's background
+    2. background-clip: text      clip that background to the letter shapes
+    3. color: transparent         make the actual glyphs see-through, so the
+                                  clipped gradient shows through them
+
+  Miss step 3 and you just get solid text over an invisible gradient. The
+  background is sized 220% so there is off-screen gradient to slide, which is
+  what the shimmer animation moves.
+*/
 .hero__line--grad {
   background: var(--grad);
   background-size: 220% 100%;
@@ -647,9 +765,12 @@ code {
   gap: 1.15rem;
   align-items: stretch;
 }
+/* Games use the same track sizing as the project grid, so three cards sit
+   in one row on desktop. (When there were only two games this had a
+   max-width cap to stop them stretching; with three, the cap would have
+   pushed the third onto its own row instead.) */
 .grid--games {
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  max-width: 860px;   /* only two games — don't let them span the full width */
 }
 
 .card {
@@ -671,8 +792,21 @@ code {
   box-shadow: var(--shadow);
 }
 
-/* The glow. A gradient layer sitting at opacity 0 until hover. Cheaper and
-   smoother than animating box-shadow colours directly. */
+/*
+  THE CURSOR-FOLLOWING GLOW
+
+  A full-size layer behind the card's content holding a radial gradient. It
+  sits at opacity 0 and fades in on hover — fading an existing layer is far
+  cheaper for the browser than animating shadow or gradient colours directly.
+
+  --mx / --my are written by script.js on every mouse move as percentages.
+  The fallbacks (50%, 0%) mean the card still looks right if JavaScript never
+  runs. This is the main bridge between the JS and CSS in this project:
+  JS supplies two numbers, CSS does all the drawing.
+
+  pointer-events: none is essential — without it this layer would sit on top
+  of the card and swallow every click, including the Details button.
+*/
 .card__glow {
   position: absolute;
   inset: -1px;
@@ -770,8 +904,12 @@ code {
 }
 .card__art span { transition: transform var(--dur-slow) var(--ease-pop); }
 .card:hover .card__art span { transform: scale(1.18) rotate(7deg); }
-.card__art--crc { background: linear-gradient(135deg, color-mix(in srgb, var(--c1) 34%, var(--bg-2)), color-mix(in srgb, var(--c3) 34%, var(--bg-2))); }
-.card__art--biz { background: linear-gradient(135deg, color-mix(in srgb, var(--c2) 34%, var(--bg-2)), color-mix(in srgb, var(--c3) 34%, var(--bg-2))); }
+/* One gradient per game so the cards are visually distinguishable.
+   color-mix() blends an accent into the surface colour, which means these
+   automatically re-tint when the theme changes — no light-mode variants. */
+.card__art--crc  { background: linear-gradient(135deg, color-mix(in srgb, var(--c1) 34%, var(--bg-2)), color-mix(in srgb, var(--c3) 34%, var(--bg-2))); }
+.card__art--biz  { background: linear-gradient(135deg, color-mix(in srgb, var(--c2) 34%, var(--bg-2)), color-mix(in srgb, var(--c3) 34%, var(--bg-2))); }
+.card__art--kids { background: linear-gradient(135deg, color-mix(in srgb, var(--c3) 34%, var(--bg-2)), color-mix(in srgb, var(--c1) 34%, var(--bg-2))); }
 
 /* ---- The accordion ---- */
 

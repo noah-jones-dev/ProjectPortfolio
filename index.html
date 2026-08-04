@@ -1,33 +1,81 @@
 <!DOCTYPE html>
 <!--
+  ============================================================================
   Noah Jones — Portfolio
-  ---------------------------------------------------------------
+  ============================================================================
+
   Plain HTML + CSS + JS. No build step, no frameworks, no npm.
   Open index.html in a browser and it runs.
 
-  Three files, three jobs:
+  THE THREE FILES
+  ---------------
     index.html  -> STRUCTURE + CONTENT (what the page says)
-    styles.css  -> PRESENTATION       (what it looks like)
-    script.js   -> BEHAVIOUR          (what it does when you poke it)
+    styles.css  -> PRESENTATION        (what it looks like)
+    script.js   -> BEHAVIOUR           (what it does when you poke it)
 
-  That split is the oldest best practice on the web. Keep to it and
-  you can change the colours without fear of breaking the content.
+  That split is the oldest best practice on the web. Keep to it and you can
+  redesign the whole site by editing only styles.css.
+
+  MAP OF THIS FILE
+  ----------------
+    <head>          metadata, favicon, stylesheet, anti-flash theme script
+    .skip-link      keyboard accessibility shortcut
+    .blobs          decorative floating background shapes
+    <header .nav>   sticky navigation + theme toggle
+    <main>
+      .hero         name, tagline, buttons, animated stat counters
+      #about        bio + quick-facts panel
+      #work         filter chips + 8 project cards
+      #games        3 NoJo Studios game cards
+      #skills       6 skill groups + specialties banner
+      #contact      4 contact cards
+    <footer>        copyright + back-to-top
+
+  HOW TO EDIT THIS FILE
+  ---------------------
+    Add a project  -> copy any <article class="card">, change the text, and
+                      give the accordion a NEW unique id (see PROJECT CARDS)
+    Change a colour-> don't touch this file; edit the tokens in styles.css
+    Add a nav link -> add an <a href="#id"> in .nav__links; the scroll-spy
+                      and smooth scrolling then work automatically
+
+  A NOTE ON THE TAGS USED HERE
+  ----------------------------
+    There are almost no plain <div>s below. <header>, <main>, <section>,
+    <article>, <nav>, <footer> are "semantic" tags — they tell browsers,
+    search engines, and screen readers what each chunk of the page IS.
+    A <div> means nothing; it's just a box. Use semantic tags by default.
 -->
 <html lang="en" data-theme="dark">
 <head>
+  <!-- charset MUST come first: it tells the browser how to decode every byte
+       after it. Without it, characters like — and é can render as mojibake. -->
   <meta charset="utf-8">
+
+  <!-- The single most important line for mobile. Without it, phones pretend
+       to be a 980px-wide desktop and shrink the page to fit — your responsive
+       CSS would never activate and everything would look tiny. -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- Shows in the browser tab and as the headline in search results. -->
   <title>Noah Jones — Software QA Engineer &amp; Game Developer</title>
+  <!-- The grey text under your title in Google results. Aim for ~155
+       characters; longer gets truncated with an ellipsis. -->
   <meta name="description" content="Portfolio of Noah Jones: Software QA Engineer specialising in test automation frameworks (Python, C#, Selenium, Playwright, Appium) and indie game developer at NoJo Studios.">
   <meta name="author" content="Noah Jones">
 
-  <!-- Open Graph: controls the preview card when the link is shared. -->
+  <!-- Open Graph: controls the preview card when someone pastes your link
+       into LinkedIn, Slack, Discord, or iMessage. Without these, the preview
+       falls back to whatever text the scraper finds first — usually the nav. -->
+  <!-- Worth adding later: <meta property="og:image" content="..."> pointing
+       at a 1200x630 PNG. That's what turns a plain link into a big card. -->
   <meta property="og:title" content="Noah Jones — Software QA Engineer &amp; Game Developer">
   <meta property="og:description" content="Test automation frameworks, desktop apps, and Unreal Engine 5 games.">
   <meta property="og:type" content="website">
 
-  <!-- Inline SVG favicon as a data URI: no extra file to host. -->
+  <!-- Favicon (the little tab icon), written inline as an SVG "data URI"
+       instead of a separate .ico file. &#127918; is the game-controller emoji.
+       Swap that number for a different emoji's code point to change it. -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127918;</text></svg>">
 
   <link rel="stylesheet" href="styles.css">
@@ -64,17 +112,44 @@
 </head>
 
 <body>
-  <!-- Keyboard users can jump straight past the nav. Invisible until focused. -->
+  <!--
+    SKIP LINK — accessibility
+    Must be the FIRST focusable thing on the page. It sits off-screen until a
+    keyboard user presses Tab, then slides into view. Without it, keyboard and
+    screen-reader users have to tab through every nav link on every visit
+    before reaching the content. One line of HTML, huge quality-of-life win.
+  -->
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <!-- Decorative floating colour blobs. aria-hidden so screen readers ignore them. -->
+  <!--
+    BACKGROUND BLOBS — decoration only
+    Three big blurred circles that drift slowly behind everything (styled and
+    animated in styles.css section 3). They're empty spans because they carry
+    no meaning — all the visual work is done in CSS.
+
+    aria-hidden="true" hides them from screen readers. Announcing three empty
+    decorative shapes would be pure noise. Rule: decorative -> aria-hidden;
+    meaningful -> describe it properly.
+  -->
   <div class="blobs" aria-hidden="true">
     <span class="blob blob--1"></span>
     <span class="blob blob--2"></span>
     <span class="blob blob--3"></span>
   </div>
 
-  <!-- ============================ NAV ============================ -->
+  <!--
+    ==========================================================================
+    NAVIGATION — sticky header
+    ==========================================================================
+    Stays pinned to the top as you scroll (position: sticky in CSS). Picks up
+    a blurred translucent background once you scroll down, via the .is-scrolled
+    class that script.js adds.
+
+    The links are plain anchors to #ids further down the page. Smooth scrolling
+    is CSS (scroll-behavior: smooth), not JavaScript. The underline that tracks
+    your position is the .is-current class, applied by the scroll spy.
+    ==========================================================================
+  -->
   <header class="nav" id="nav">
     <a class="nav__brand" href="#top">
       <span class="nav__mark">NJ</span>
@@ -89,6 +164,16 @@
       <a href="#contact">Contact</a>
     </nav>
 
+    <!--
+      THEME TOGGLE
+      Both icons live in the button, stacked on top of each other. CSS slides
+      one out and the other in depending on data-theme, which is cheaper and
+      smoother than swapping the character in JavaScript.
+
+      aria-label is essential: the button's visible content is two decorative
+      glyphs, so without it a screen reader would announce "button" with no
+      hint of what it does. title= gives sighted users a hover tooltip.
+    -->
     <button class="theme-toggle" id="themeToggle" type="button"
             aria-label="Switch colour theme" title="Switch colour theme">
       <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">☀</span>
@@ -96,8 +181,22 @@
     </button>
   </header>
 
+  <!-- <main> marks the primary content — exactly one per page. This is the
+       target of the skip link above. -->
   <main id="main">
-    <!-- ============================ HERO ============================ -->
+    <!--
+      ==========================================================================
+      HERO — the first screen
+      ==========================================================================
+      Deliberately shorter than a full screen height so a sliver of the stats
+      row peeks above the fold, signalling there's more below.
+
+      The <h1> is split into two <span class="hero__line">s so "Noah" and
+      "Jones" stack, and so the second can carry the animated gradient.
+      There is exactly ONE <h1> on the page — it's the document's title in the
+      heading outline, not just "the biggest text".
+      ==========================================================================
+    -->
     <section class="hero" id="top">
       <p class="hero__eyebrow reveal">Software QA Engineer &amp; Indie Game Developer</p>
 
@@ -121,7 +220,19 @@
         <a class="btn btn--ghost" href="#contact">Get in touch</a>
       </div>
 
-      <!-- Live counters, filled in by script.js from the real cards on the page. -->
+      <!--
+        STAT COUNTERS
+        <dl> is a "description list" — the right tag for label/value pairs.
+        <dt> is the term (the label), <dd> is the definition (the number).
+
+        Each <dd> holds "0" in the markup and carries the real figure in
+        data-count. script.js animates from 0 up to data-count when the row
+        scrolls into view. Starting at 0 in the HTML means the animation has
+        somewhere to start from; if JS never runs, you'd see 0, which is why
+        the numbers are also stated in plain text elsewhere on the page.
+
+        TO UPDATE: change the data-count value, not the text between the tags.
+      -->
       <dl class="stats reveal">
         <div class="stat">
           <dt>Automation frameworks</dt>
@@ -133,7 +244,7 @@
         </div>
         <div class="stat">
           <dt>Games shipped</dt>
-          <dd data-count="2">0</dd>
+          <dd data-count="3">0</dd>
         </div>
         <div class="stat">
           <dt>Languages</dt>
@@ -146,7 +257,15 @@
       </a>
     </section>
 
-    <!-- ============================ ABOUT ============================ -->
+    <!--
+      ==========================================================================
+      ABOUT — bio and quick facts
+      ==========================================================================
+      Two columns on desktop (prose + facts panel), stacking to one on narrow
+      screens. The <aside> is the right tag for the facts panel: it's related
+      to the main content but not part of its main flow.
+      ==========================================================================
+    -->
     <section class="section" id="about">
       <div class="section__head reveal">
         <span class="section__num">01</span>
@@ -192,7 +311,35 @@
       </div>
     </section>
 
-    <!-- ============================ WORK ============================ -->
+    <!--
+      ==========================================================================
+      WORK — GitHub projects
+      ==========================================================================
+      Filter chips + a responsive grid of project cards.
+
+      HOW THE FILTER WORKS
+        Each card carries   data-cat="web" | "mobile" | "desktop"
+        Each chip carries   data-filter="all" | "web" | "mobile" | "desktop"
+        script.js hides any card whose data-cat doesn't match the active
+        data-filter. The two attribute values MUST match exactly, or the
+        card silently disappears from that category.
+
+      ANATOMY OF A CARD  (copy this whole <article> to add a project)
+        <article class="card" data-cat="...">   the card, and its filter group
+          <div class="card__glow">              cursor-following hover glow
+          <header class="card__head">           icon + title + language line
+          <p class="card__desc">                one or two sentence summary
+          <ul class="tags">                     small tech tags
+          <button class="accordion__trigger">   the "Details" toggle
+          <div class="accordion__panel">        the expandable content
+
+      THE ONE THING THAT MUST BE UNIQUE
+        The button's  aria-controls="d-xyz"  must match the panel's  id="d-xyz",
+        and no other card may use that id. Duplicate ids break the accordion —
+        clicking one card would toggle another. Use a short name based on the
+        project, e.g. id="d-behave".
+      ==========================================================================
+    -->
     <section class="section" id="work">
       <div class="section__head reveal">
         <span class="section__num">02</span>
@@ -203,7 +350,18 @@
         </p>
       </div>
 
-      <!-- Filter chips. role="tablist" would be wrong here; these are buttons. -->
+      <!--
+        FILTER CHIPS
+        Real <button>s, not styled <div>s — buttons are focusable, respond to
+        Enter and Space for free, and are announced correctly by screen readers.
+
+        role="group" + aria-label tells assistive tech these belong together
+        and what they're for. (role="tablist" would be wrong: these don't
+        switch between panels, they filter one list in place.)
+
+        type="button" matters — the default for a <button> is type="submit",
+        which would try to submit a form if one ever wrapped these.
+      -->
       <div class="filters reveal" id="filters" role="group" aria-label="Filter projects by category">
         <button class="chip is-active" type="button" data-filter="all">All</button>
         <button class="chip" type="button" data-filter="web">Web automation</button>
@@ -211,32 +369,91 @@
         <button class="chip" type="button" data-filter="desktop">Desktop apps</button>
       </div>
 
+      <!--
+        FILTER STATUS — accessibility
+        Deliberately empty; script.js writes "Showing 2 projects..." into it.
+
+        aria-live="polite" makes a screen reader announce that text whenever it
+        changes. Without this, clicking a filter is completely SILENT to a
+        non-sighted user — cards vanish with no feedback at all. Any time your
+        JavaScript changes the page in a way that's only visible, say it here.
+      -->
       <p class="filter-status" id="filterStatus" role="status" aria-live="polite"></p>
 
       <div class="grid" id="projectGrid">
 
-        <!-- ---------- PracticeTestTool ---------- -->
+        <!--
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          REFERENCE CARD — fully annotated. The seven cards after this one
+          follow the identical structure with comments trimmed. Copy THIS one
+          when adding a project.
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+          <article>  = a self-contained piece of content that would still make
+                       sense on its own. Correct tag for a card.
+          data-cat   = which filter chip shows this card. Must match a chip's
+                       data-filter value exactly.
+          .reveal    = opt in to the fade-up-on-scroll effect (script.js).
+                       Remove the class and the card is simply always visible.
+        -->
         <article class="card reveal" data-cat="desktop">
+
+          <!-- The hover glow layer. Empty and decorative; script.js feeds it
+               the cursor position and styles.css paints a radial gradient. -->
           <div class="card__glow" aria-hidden="true"></div>
+
           <header class="card__head">
+            <!-- Emoji as an icon. aria-hidden because the heading beside it
+                 already says what this is — otherwise a screen reader would
+                 announce "memo, Practice Test Tool". -->
             <span class="card__icon" aria-hidden="true">📝</span>
             <div>
+              <!-- <h3> because the section's <h2> is "Work". Never pick a
+                   heading level for its size — that's what CSS is for. -->
               <h3 class="card__title">Practice Test Tool</h3>
+              <!-- The coloured dot is language-branded (see .dot--* in CSS).
+                   Note the language is also written in text: colour alone must
+                   never be the only way information is conveyed. -->
               <p class="card__meta"><span class="dot dot--js"></span>JavaScript · Desktop</p>
             </div>
           </header>
+
+          <!-- One or two sentences. This is what a visitor skims. -->
           <p class="card__desc">
             A cross-platform desktop app for taking practice quizzes of any kind —
             designed in Claude Design, then built in Claude Code.
           </p>
+
+          <!-- A list of technologies, so <ul>/<li> rather than a row of spans. -->
           <ul class="tags">
             <li>JavaScript</li><li>Cross-platform</li><li>Desktop</li><li>AI-assisted</li>
           </ul>
 
+          <!--
+            ACCORDION TRIGGER
+            aria-expanded="false" — script.js flips this to "true" on open, and
+              that is what makes a screen reader announce "expanded"/"collapsed".
+              The rotating chevron only helps people who can see it.
+            aria-controls  — points at the id of the panel this button opens.
+                             Must match the panel's id below, and be unique.
+            The chevron is inline SVG so it inherits the text colour via
+            stroke="currentColor" and rotates with a CSS transform.
+          -->
           <button class="accordion__trigger" type="button" aria-expanded="false" aria-controls="d-practicetest">
             <span>Details</span>
             <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
           </button>
+
+          <!--
+            ACCORDION PANEL
+            hidden      — collapsed before JavaScript runs; script.js removes
+                          this and hands control to CSS. The <noscript> block
+                          in <head> force-opens panels if JS never loads, so
+                          the GitHub link inside is always reachable.
+            role="region" — marks the revealed content as a navigable landmark.
+            The inner <div> is REQUIRED: the 0fr-to-1fr height animation needs
+            a child to clip with overflow: hidden. Don't remove it.
+          -->
           <div class="accordion__panel" id="d-practicetest" role="region" hidden>
             <div class="accordion__inner">
               <h4>What it does</h4>
@@ -597,7 +814,25 @@
       </p>
     </section>
 
-    <!-- ============================ GAMES ============================ -->
+    <!--
+      ==========================================================================
+      GAMES — NoJo Studios (itch.io)
+      ==========================================================================
+      Same card component as Work, plus a .card__art panel on top and no
+      data-cat (the filter chips only apply to the Work grid).
+
+      The .card__art blocks are gradient placeholders with an emoji. Swapping
+      in real cover images is the single biggest visual upgrade available here:
+
+        <div class="card__art">
+          <img src="assets/bored-crc.jpg" alt="Bored CRC Specialist gameplay"
+               width="800" height="450" loading="lazy">
+        </div>
+
+      Always set width/height (stops the page jumping as images load) and
+      loading="lazy" for anything below the fold.
+      ==========================================================================
+    -->
     <section class="section section--games" id="games">
       <div class="section__head reveal">
         <span class="section__num">03</span>
@@ -686,6 +921,52 @@
           </div>
         </article>
 
+        <!--
+          GAME CARD 3 — Bored Kids Ding Dong Ditching Houses
+          Same structure as the two above. To add a fourth game, copy this
+          whole <article> and change: the title, the description, the tags,
+          the card__art--* class, and BOTH the aria-controls on the button
+          and the id on the panel (they must match, and be unique).
+        -->
+        <article class="card card--game reveal">
+          <div class="card__glow" aria-hidden="true"></div>
+          <div class="card__art card__art--kids" aria-hidden="true"><span>🔔</span></div>
+          <header class="card__head">
+            <div>
+              <h3 class="card__title">Bored Kids Ding Dong Ditching Houses</h3>
+              <p class="card__meta"><span class="dot dot--ue"></span>Unreal Engine 5 · Adventure</p>
+            </div>
+          </header>
+          <p class="card__desc">
+            Bored kids, a quiet neighbourhood, and a row of doorbells. Ring one,
+            run, and try not to get caught.
+          </p>
+          <ul class="tags">
+            <li>Unreal Engine 5</li><li>Adventure</li><li>Comedy</li><li>Stealth</li>
+          </ul>
+
+          <button class="accordion__trigger" type="button" aria-expanded="false" aria-controls="d-kids">
+            <span>Details</span>
+            <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="accordion__panel" id="d-kids" role="region" hidden>
+            <div class="accordion__inner">
+              <h4>The idea</h4>
+              <p>
+                The third entry in the <em>Bored</em> series, and the one that turns
+                boredom into a chase: pick a house, ring the bell, and disappear before
+                anyone opens the door.
+              </p>
+              <h4>Built with</h4>
+              <p>
+                Unreal Engine 5 — neighbourhood level design, stealth and escape
+                mechanics, and NPC reactions.
+              </p>
+              <a class="btn btn--small btn--primary" href="https://nojo-studios.itch.io/" target="_blank" rel="noopener noreferrer">Play on itch.io ↗</a>
+            </div>
+          </div>
+        </article>
+
       </div>
 
       <p class="section__foot reveal">
@@ -694,7 +975,18 @@
       </p>
     </section>
 
-    <!-- ============================ SKILLS ============================ -->
+    <!--
+      ==========================================================================
+      SKILLS — grouped capability lists
+      ==========================================================================
+      Six groups in an auto-fitting grid, each a simple <ul> of pills. Content
+      mirrors the skills list on the GitHub profile README — when you update
+      one, update the other so they don't drift apart.
+
+      To add a group: copy a whole <div class="skillgroup">. The grid reflows
+      on its own; no CSS changes needed.
+      ==========================================================================
+    -->
     <section class="section" id="skills">
       <div class="section__head reveal">
         <span class="section__num">04</span>
@@ -762,7 +1054,24 @@
       </div>
     </section>
 
-    <!-- ============================ CONTACT ============================ -->
+    <!--
+      ==========================================================================
+      CONTACT — four outbound links
+      ==========================================================================
+      Plain links, not a form. A contact form on a static site needs a backend
+      or a third-party service to actually deliver mail; links work everywhere
+      with nothing to maintain and nothing to break.
+
+      Every external link carries:
+        target="_blank"            open in a new tab
+        rel="noopener noreferrer"  security. Without noopener, the page you
+                                   open can reach back via window.opener and
+                                   redirect YOUR tab to a phishing page.
+                                   Always pair these two with target="_blank".
+
+      The mailto: link needs neither, since it hands off to a mail client.
+      ==========================================================================
+    -->
     <section class="section section--contact" id="contact">
       <div class="section__head reveal">
         <span class="section__num">05</span>
