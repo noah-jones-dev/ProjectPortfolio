@@ -4,9 +4,23 @@
 
 Never leave commits on a branch that no open PR points at.
 
-- Before pushing, check whether an open PR already tracks the branch.
-- If one exists, push — the commits join that PR automatically.
-- If none exists, **push and open a PR in the same step.** Don't wait to be
+### Check the live state before every push — don't rely on memory
+
+Query GitHub for the branch's **currently open** PRs immediately before pushing:
+
+```bash
+gh pr list --head <branch> --state open      # or the equivalent API call
+```
+
+"I opened a PR for this branch earlier" is **not** evidence that one is open
+now. A PR can be merged or closed between two pushes in the same session, and
+that is exactly when commits go missing. Re-check every time — it is one cheap
+call, and the failure it prevents is silent.
+
+Then:
+
+- **An open PR tracks the branch** → push; the commits join it automatically.
+- **None does** → **push and open a PR in the same step.** Don't wait to be
   asked, and don't wait until the work "feels finished".
 
 A PR tracks a *branch*, not a commit, which is why later pushes flow into an
@@ -24,6 +38,26 @@ git rebase origin/main      # keeps unmerged commits, drops merged ones
 git push --force-with-lease
 # then open a new PR
 ```
+
+### When to open a new PR rather than push to the open one
+
+Open a **new** PR when:
+
+- The open PR has just been merged or closed — it can't carry more work.
+- The change is a distinct piece of work with its own reason to exist, so it
+  can be reviewed, merged, or reverted on its own.
+- The open PR is being reviewed and unrelated commits would muddy the diff.
+
+Push to the **existing** PR when:
+
+- The work continues or fixes what that PR already covers.
+- It's a follow-up to review feedback on that PR.
+- Splitting it out would produce a PR too small to stand alone, and no separate
+  branch exists to raise it from.
+
+Prefer one coherent subject per PR. When something unrelated has to ride along
+because only one branch is available, say so explicitly rather than quietly
+widening the PR's scope.
 
 ## Site conventions
 
