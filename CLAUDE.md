@@ -42,6 +42,9 @@ as-is.
   `aria-live` regions, the skip link, the `<noscript>` fallback, and 44px
   touch targets under `@media (pointer: coarse)`.
 - New hover effects need a matching reset in the `@media (hover: none)` block,
-  or they stick after a tap on touchscreens.
+  or they stick after a tap on touchscreens. This especially covers colours
+  set for *another* hover effect's background — reset only half a hover state
+  and you strand, say, white text on a wash that never appeared. Genuine
+  states (`.is-copied`) must survive the reset.
 
 See `docs/STRUCTURE.md` for the reasoning behind each of these.
