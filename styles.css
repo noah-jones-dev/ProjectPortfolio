@@ -1470,6 +1470,30 @@ code {
   .contactcard:hover .contactcard__label { color: var(--text-dim); }
   .contactcard:hover .contactcard__value { color: inherit; }
 
+  /*
+    The copy button MUST be reset too, and missing it made the button vanish.
+
+    .contactcard:hover .copybtn turns the icon white, which is correct while
+    the card's gradient wash is showing. On a touchscreen the tap fired
+    :hover and left it stuck — but the wash above is reset to invisible, so
+    the card stayed white. White icon on a white card: the button appeared
+    to delete itself after one tap.
+
+    Whenever a hover rule changes a colour, its reset belongs here as well,
+    or the element keeps a colour chosen for a background that isn't there.
+  */
+  .contactcard:hover .copybtn {
+    background: var(--surface-2);
+    border-color: var(--border);
+    color: var(--text-dim);
+  }
+  /* ...except while the tick is showing, which is a real state, not hover. */
+  .contactcard:hover .copybtn.is-copied {
+    background: var(--c3);
+    border-color: transparent;
+    color: #fff;
+  }
+
   .stat:hover, .skillgroup:hover, .chip:hover, .theme-toggle:hover,
   .btn--primary:hover, .btn--ghost:hover, .footer__top:hover { transform: none; }
   .pills li:hover { transform: none; color: var(--text-dim); border-color: var(--border); }

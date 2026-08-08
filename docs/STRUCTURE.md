@@ -606,6 +606,45 @@ until you tap elsewhere. Cards sat permanently lifted and glowing.
 touch-screen laptops keep their effects. The `:active` states still fire on
 press, so tapping keeps its feedback.
 
+**The follow-up bug — a button that deleted itself.** The copy button on the
+email card vanished after one tap on a phone. The cause is worth internalising,
+because the reset block above is only as good as its coverage.
+
+The card's hover state slides a gradient wash up behind its contents, so the
+copy button turns white to stay legible against it:
+
+```css
+.contactcard:hover .copybtn { color: #fff; }
+```
+
+Correct on a desktop. On a touchscreen the tap fired `:hover` and it stuck —
+but the wash itself *was* reset to invisible. So the card stayed white while
+the icon stayed white. White on white: the button looked deleted.
+
+**Stuck hover is worse than it first appears.** It's not only that an effect
+lingers — a colour chosen to sit on top of *another* hover effect is left
+stranding on a background that never appeared. Resetting a hover effect
+halfway is more dangerous than not resetting it at all.
+
+So every colour-changing hover rule needs its reset in the `(hover: none)`
+block, including the ones nested inside another hover state:
+
+```css
+@media (hover: none) {
+  .contactcard:hover .copybtn { color: var(--text-dim); background: var(--surface-2); }
+  /* ...but a real state, not hover, still wins */
+  .contactcard:hover .copybtn.is-copied { color: #fff; background: var(--c3); }
+}
+```
+
+That second rule matters: the "copied" tick is genuine state, not a hover
+artifact, so the reset must not flatten it.
+
+**How to check for the whole class of bug** rather than one instance: tap each
+interactive control on a touch emulator, then measure the contrast of what's
+left. Anything under about 3:1 is effectively invisible. That sweep is what
+confirmed the copy button was the only real case here.
+
 **3. Landscape was keyed off the wrong axis.**
 
 A phone rotated sideways is ~844px wide, so every width-based rule treated it
