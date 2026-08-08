@@ -278,6 +278,37 @@ look, completely different performance.
 speed. The `1.56` in the second curve overshoots slightly past the target and
 settles back. That tiny bounce is what makes the icons and chevron feel alive.
 
+### A shadow inside a clipped container
+
+A bug worth knowing, because it looks like a rendering glitch and isn't.
+
+The "View on GitHub" button showed a **pale square block** around its pill
+shape. The button is fine; the container is the problem.
+
+`.accordion__inner` must keep `overflow: hidden` — that's what clips the
+content while the `0fr → 1fr` height animation runs. The button sits *flush*
+against that container's left and bottom edges, zero gap. Its shadow
+(`0 8px 24px`) needs about 24px to each side and 32px below.
+
+So the browser drew the soft glow, then the clip sliced it off — leaving
+dead-straight vertical and horizontal edges. A blurred shadow with square
+corners doesn't read as a shadow; it reads as a stray coloured rectangle.
+
+```css
+.btn--small,
+.btn--small:hover { box-shadow: none; }
+```
+
+**The general rule:** a blurred shadow needs clear space around its element.
+`overflow: hidden` on any ancestor will cut it into a hard edge. Either give
+the element room — padding on the container — or don't draw the shadow.
+
+**How to diagnose this class of bug:** don't guess, bisect. Toggle one
+property at a time in DevTools and see which one makes the artifact vanish.
+Here, `box-shadow: none` fixed it while `overflow: visible` and
+`transition: none` changed nothing — which pinned the cause to the shadow in
+one step rather than three theories.
+
 ### Duration
 
 Interface animation lives between **150ms and 400ms**. Under 100ms reads as an
