@@ -1,5 +1,9 @@
 # Noah Jones — Portfolio
 
+> [!note]
+> **Site link**: 
+> [portfolio site](http://noah-jones-dev.github.io/ProjectPortfolio)
+
 A personal portfolio site covering my QA engineering work, desktop apps, and
 Unreal Engine 5 games. Built with plain HTML, CSS, and JavaScript — no
 frameworks, no build step, no `npm install` needed to run it.
