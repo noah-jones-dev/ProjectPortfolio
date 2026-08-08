@@ -480,6 +480,27 @@ code {
 
 .btn--small { --btn-pad: 0.58rem 1.1rem; font-size: 0.87rem; }
 
+/*
+  No glow on small buttons — and this one is worth understanding, because it
+  bites any shadow placed inside a clipped container.
+
+  THE BUG: "View on GitHub" showed a pale square block around the pill.
+
+  .btn--small lives inside .accordion__inner, which MUST keep
+  overflow: hidden for the 0fr -> 1fr expand animation to work. The button
+  sits flush against that container's left and bottom edges (zero gap), while
+  its shadow (0 8px 24px) needs ~24px to each side and ~32px below.
+
+  So the shadow was drawn and then sliced off by the clip: a soft glow ending
+  in dead-straight vertical and horizontal edges, which reads as a square
+  block rather than a shadow.
+
+  A blurred shadow needs clear space around its element. When it can't have
+  that, don't draw it. These buttons get their depth from the gradient alone.
+*/
+.btn--small,
+.btn--small:hover { box-shadow: none; }
+
 .btn__arrow { transition: transform var(--dur) var(--ease-pop); }
 .btn:hover .btn__arrow { transform: translateX(5px); }
 
