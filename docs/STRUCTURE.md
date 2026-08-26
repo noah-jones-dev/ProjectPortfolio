@@ -506,6 +506,59 @@ someone guessing whether a control worked.**
 
 ---
 
+## 8c. Keeping the résumé current without a server
+
+The résumé section embeds one Google Drive file by its ID. That single decision
+is what makes it self-updating, and it is worth understanding why the obvious
+alternative doesn't work.
+
+### Why the page can't scan an inbox
+
+The natural request is "check my email for the newest résumé every time the
+page loads." A static site cannot do that, and shouldn't:
+
+- **There is no server.** GitHub Pages hands the browser three files. Nothing
+  runs on a machine you control, so there is nothing to do the checking.
+- **API keys in a web page are public.** Anything shipped to the browser can be
+  read with View Source. A Gmail credential placed there is a credential
+  given away — not "hidden in the JavaScript."
+- **The visitor is not you.** Browser-side OAuth authenticates *whoever is
+  looking at the page*. A recruiter would be shown a Google consent screen
+  asking to read **their** inbox. That is alarming, and it still wouldn't
+  return your résumé.
+
+**The general rule:** a browser cannot hold a secret. If something needs
+credentials, it has to run somewhere you control — a server, or a scheduled
+job with the key in a secret store.
+
+### What works instead
+
+Drive already solves it. A file's ID is stable, and Drive serves the file's
+*current* contents:
+
+```
+https://drive.google.com/file/d/FILE_ID/preview     embedded viewer
+https://drive.google.com/uc?export=download&id=FILE_ID   direct download
+```
+
+Upload a new version *into that file* (Manage versions) and every reference
+updates at once. No automation, no scheduled job, no credential anywhere — so
+nothing can silently break.
+
+The failure mode this replaces is subtle: creating a new file per version means
+a new ID each time, and a page that keeps confidently pointing at last year's
+document.
+
+### If you truly need cross-file automation
+
+A scheduled GitHub Action can search Drive for the newest matching file and
+commit it to the repo. The key lives in GitHub **Secrets**, which is a place
+you control — never in the page. That is real work to set up (Google Cloud
+project, service account, shared folder) and it can fail quietly, which is why
+the one-file approach is the better default.
+
+---
+
 ## 9. Performance
 
 The whole site is roughly 60 KB of HTML, CSS, and JS. For comparison, a single
