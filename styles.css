@@ -1,24 +1,24 @@
 /* =========================================================================
-   Noah Jones — Portfolio stylesheet
+   Noah Jones · Portfolio stylesheet
    =========================================================================
 
    CONTENTS
-     1.  Design tokens      — every colour, size, and timing lives here, ONCE
-     2.  Reset & base       — box model, typography, focus ring, skip link
-     3.  Background blobs   — the drifting colour shapes behind everything
-     4.  Navigation         — sticky header, nav links, theme toggle
-     5.  Buttons            — .btn and its variants
-     6.  Hero               — first screen, gradient name, stat counters
-     7.  Section shell      — shared padding/heading styles + About layout
-     8.  Cards + accordion  — project & game cards, filter chips, expanders
-     9.  Skills             — skill group boxes and pills
-     10. Contact            — contact cards with the gradient hover wash
-     10b Resume             — live Drive PDF embed + details panel
+     1.  Design tokens      - every colour, size, and timing lives here, ONCE
+     2.  Reset & base       - box model, typography, focus ring, skip link
+     3.  Background blobs   - the drifting colour shapes behind everything
+     4.  Navigation         - sticky header, nav links, theme toggle
+     5.  Buttons            - .btn and its variants
+     6.  Hero               - first screen, gradient name, stat counters
+     7.  Section shell      - shared padding/heading styles + About layout
+     8.  Cards + accordion  - project & game cards, filter chips, expanders
+     9.  Skills             - skill group boxes and pills
+     10. Contact            - contact cards with the gradient hover wash
+     10b Resume             - live Drive PDF embed + details panel
      11. Footer
-     12. Reveal-on-scroll   — the fade-up animation states
-     13. Reduced motion     — accessibility override, MUST stay last-ish
-     14. Responsive         — the four breakpoints
-     15. Touch devices      — sticky-hover fix, 44px targets, safe areas
+     12. Reveal-on-scroll   - the fade-up animation states
+     13. Reduced motion     - accessibility override, MUST stay last-ish
+     14. Responsive         - the four breakpoints
+     15. Touch devices      - sticky-hover fix, 44px targets, safe areas
 
    THE BIG IDEA
      Nothing below section 1 hardcodes a colour. Everything references a
@@ -52,7 +52,7 @@
   for the job they do and themes stay honest.
 */
 :root {
-  /* ---- Neon Arcade (dark) — the default ---- */
+  /* ---- Neon Arcade (dark), the default ---- */
   --bg:         #0B0A10;   /* page background                          */
   --bg-2:       #100E18;   /* slightly lifted background, for gradients */
   --surface:    rgba(255, 255, 255, 0.045);  /* card backgrounds        */
@@ -97,7 +97,7 @@
      Durations: UI animation belongs between 150ms and 400ms. Below ~100ms
      reads as an instant jump; above ~500ms feels like waiting.
 
-     Easing: linear motion feels robotic — nothing physical moves at a
+     Easing: linear motion feels robotic, nothing physical moves at a
      constant speed. The 1.56 in --ease-pop overshoots slightly past the
      target and settles back; that tiny bounce is what makes the icons and
      chevrons feel alive rather than mechanical. */
@@ -109,8 +109,8 @@
 }
 
 /* ---- Candy (light). Same variable NAMES, different values. ----
-   Note the accents are DARKER here. Neon cyan on white is unreadable —
-   a colour that works on black usually needs deepening for white. */
+   Note the accents are DARKER here. Neon cyan on white is unreadable. A colour that works
+   on black usually needs deepening for white. */
 :root[data-theme="light"] {
   --bg:         #FBF9FF;
   --bg-2:       #FFFFFF;
@@ -123,7 +123,7 @@
   --text-dim:   #5C5474;
 
   --c1: #D6157E;   /* 4.7:1 on --bg */
-  --c2: #01718C;   /* 5.4:1 — deepened from the neon cyan, which only
+  --c2: #01718C;   /* 5.4:1, deepened from the neon cyan, which only
                       managed 4.0:1 here and failed AA for small text */
   --c3: #6D28D9;
 
@@ -138,7 +138,7 @@
 /*
   border-box means an element's width INCLUDES its padding and border. The
   browser default (content-box) excludes them, so a 300px box with 20px
-  padding is actually 340px wide — the classic "why is my layout 40px too
+  padding is actually 340px wide, the classic "why is my layout 40px too
   wide" bug. Setting this on everything is the first line of almost every
   professional stylesheet.
 */
@@ -149,7 +149,7 @@ html {
      Section 13 turns this off for people who prefer reduced motion. */
   scroll-behavior: smooth;
 
-  /* Without this, clicking a nav link scrolls the section to y=0 — directly
+  /* Without this, clicking a nav link scrolls the section to y=0, directly
      underneath the sticky header, hiding its heading. This reserves the
      header's height. If you change the nav height, change this too. */
   scroll-padding-top: 92px;
@@ -179,7 +179,7 @@ body {
   -webkit-font-smoothing: antialiased;
 
   /* Makes the theme switch fade rather than snap. Note it lists specific
-     properties — `transition: all` is a performance trap, because the browser
+     properties. `transition: all` is a performance trap, because the browser
      then has to watch every animatable property for changes. */
   transition: background-color var(--dur) var(--ease),
               color var(--dur) var(--ease);
@@ -208,12 +208,12 @@ code {
 }
 
 /*
-  THE FOCUS RING — do not delete this.
+  THE FOCUS RING, do not delete this.
 
   You will find advice online saying `outline: none` to "clean up" a design.
   Doing that makes the site unusable for anyone navigating by keyboard, since
   the ring is the only thing showing where they are. If you dislike the
-  browser default, RESTYLE it — as here — never remove it.
+  browser default, RESTYLE it, as here, never remove it.
 
   :focus-visible rather than :focus is the modern refinement: the ring appears
   for keyboard navigation but not when you click with a mouse. Best of both.
@@ -316,7 +316,7 @@ code {
 
   color-mix() builds a translucent version of the current --bg, so this works
   in both themes from one rule. backdrop-filter blurs whatever is BEHIND the
-  element — the frosted-glass effect. The -webkit- line is for Safari.
+  element, the frosted-glass effect. The -webkit- line is for Safari.
 */
 .nav.is-scrolled {
   background: color-mix(in srgb, var(--bg) 78%, transparent);
@@ -482,7 +482,7 @@ code {
 .btn--small { --btn-pad: 0.58rem 1.1rem; font-size: 0.87rem; }
 
 /*
-  No glow on small buttons — and this one is worth understanding, because it
+  No glow on small buttons, and this one is worth understanding, because it
   bites any shadow placed inside a clipped container.
 
   THE BUG: "View on GitHub" showed a pale square block around the pill.
@@ -544,7 +544,7 @@ code {
 .hero__line { display: block; }
 
 /*
-  ANIMATED GRADIENT TEXT — three steps that only work together:
+  ANIMATED GRADIENT TEXT, three steps that only work together:
     1. background: <gradient>     paint a gradient on the element's background
     2. background-clip: text      clip that background to the letter shapes
     3. color: transparent         make the actual glyphs see-through, so the
@@ -819,7 +819,7 @@ code {
   THE CURSOR-FOLLOWING GLOW
 
   A full-size layer behind the card's content holding a radial gradient. It
-  sits at opacity 0 and fades in on hover — fading an existing layer is far
+  sits at opacity 0 and fades in on hover, fading an existing layer is far
   cheaper for the browser than animating shadow or gradient colours directly.
 
   --mx / --my are written by script.js on every mouse move as percentages.
@@ -827,7 +827,7 @@ code {
   runs. This is the main bridge between the JS and CSS in this project:
   JS supplies two numbers, CSS does all the drawing.
 
-  pointer-events: none is essential — without it this layer would sit on top
+  pointer-events: none is essential, without it this layer would sit on top
   of the card and swallow every click, including the Details button.
 */
 .card__glow {
@@ -915,7 +915,7 @@ code {
   color: var(--text-dim);
 }
 
-/* Game cover art placeholder — a gradient panel until real screenshots land. */
+/* Game cover art placeholder, a gradient panel until real screenshots land. */
 .card__art {
   height: 132px;
   margin: -1.4rem -1.4rem 1.1rem;
@@ -929,7 +929,7 @@ code {
 .card:hover .card__art span { transform: scale(1.18) rotate(7deg); }
 /* One gradient per game so the cards are visually distinguishable.
    color-mix() blends an accent into the surface colour, which means these
-   automatically re-tint when the theme changes — no light-mode variants. */
+   automatically re-tint when the theme changes, no light-mode variants. */
 .card__art--crc  { background: linear-gradient(135deg, color-mix(in srgb, var(--c1) 34%, var(--bg-2)), color-mix(in srgb, var(--c3) 34%, var(--bg-2))); }
 .card__art--biz  { background: linear-gradient(135deg, color-mix(in srgb, var(--c2) 34%, var(--bg-2)), color-mix(in srgb, var(--c3) 34%, var(--bg-2))); }
 .card__art--kids { background: linear-gradient(135deg, color-mix(in srgb, var(--c3) 34%, var(--bg-2)), color-mix(in srgb, var(--c1) 34%, var(--bg-2))); }
@@ -1243,7 +1243,7 @@ code {
   opacity animate, so it composites on the GPU.
 
   pointer-events: none means it can never block a click on whatever is
-  underneath it — important for something that floats over the page.
+  underneath it, important for something that floats over the page.
 */
 .toast {
   position: fixed;
@@ -1414,7 +1414,7 @@ code {
 
 /*
   Some people get motion sickness from parallax and drifting shapes, and set
-  a system preference to say so. Honouring it is not optional — it is a core
+  a system preference to say so. Honouring it is not optional, it is a core
   accessibility requirement. Colour and layout survive; only movement stops.
 */
 @media (prefers-reduced-motion: reduce) {
@@ -1435,7 +1435,7 @@ code {
 
 /*
   Breakpoints are placed where THIS design breaks, not at named device sizes.
-  Chasing "the iPhone width" is a losing game — there are hundreds, and they
+  Chasing "the iPhone width" is a losing game, there are hundreds, and they
   change every year. Resize the window until something looks wrong, then add
   a breakpoint there. That's how these four were chosen.
 
@@ -1482,7 +1482,7 @@ code {
 /*
   --- Small phones (<=430px): the nav wraps to two rows ---
 
-  THE BUG THIS FIXES: at 320px the nav needed 378px — brand (34) + links
+  THE BUG THIS FIXES: at 320px the nav needed 378px, brand (34) + links
   (251) + toggle (42) + gaps + padding. With flex-wrap: nowrap the toggle
   was pushed off-screen and the whole PAGE scrolled sideways.
 
@@ -1513,7 +1513,7 @@ code {
 /*
   --- Short landscape screens ---
   Keyed to HEIGHT, not width. A phone turned sideways is ~844px wide, so
-  width-based rules treat it like a small laptop — and 13vw makes the hero
+  width-based rules treat it like a small laptop, and 13vw makes the hero
   title ~110px tall on a 390px-tall screen, filling the entire display.
 */
 @media (max-height: 500px) and (orientation: landscape) {
@@ -1534,7 +1534,7 @@ code {
 */
 
 /* 1. NO STICKY HOVER.
-      Touchscreens have no cursor, so a tap fires :hover — and it STAYS
+      Touchscreens have no cursor, so a tap fires :hover, and it STAYS
       applied until you tap something else. Cards stay lifted, contact
       cards keep their gradient wash. It looks broken.
 
@@ -1562,7 +1562,7 @@ code {
 
     .contactcard:hover .copybtn turns the icon white, which is correct while
     the card's gradient wash is showing. On a touchscreen the tap fired
-    :hover and left it stuck — but the wash above is reset to invisible, so
+    :hover and left it stuck, but the wash above is reset to invisible, so
     the card stayed white. White icon on a white card: the button appeared
     to delete itself after one tap.
 
@@ -1602,7 +1602,7 @@ code {
      44px on width even when the height is right. Both axes matter. */
   .nav__links a { min-width: 44px; justify-content: center; }
 
-  /* The scroll hint is decorative, but it IS a link — give it a real
+  /* The scroll hint is decorative, but it IS a link, give it a real
      tap area via padding rather than growing the drawn mouse shape. */
   .scroll-cue { padding: 0.4rem 0.75rem; }
 
@@ -1630,7 +1630,7 @@ code {
   /*
     NOT enlarged: the inline links inside sentences (.section__foot a).
     WCAG's target-size rule explicitly exempts targets embedded in a block
-    of text — padding them to 44px would wreck the line spacing around
+    of text, padding them to 44px would wreck the line spacing around
     them. Size minimums apply to standalone controls, not prose links.
   */
 
@@ -1648,7 +1648,7 @@ a, button {
 }
 
 /*
-  SAFE AREA INSETS — notches and home indicators.
+  SAFE AREA INSETS, notches and home indicators.
   On phones with a notch or rounded corners, the browser reports the full
   screen but part of it is physically obscured. env(safe-area-inset-*)
   exposes the unusable margin; max() keeps our normal padding when the inset

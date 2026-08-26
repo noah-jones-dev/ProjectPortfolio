@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   ============================================================================
-  Noah Jones — Portfolio
+  Noah Jones · Portfolio
   ============================================================================
 
   Plain HTML + CSS + JS. No build step, no frameworks, no npm.
@@ -43,23 +43,23 @@
   A NOTE ON THE TAGS USED HERE
   ----------------------------
     There are almost no plain <div>s below. <header>, <main>, <section>,
-    <article>, <nav>, <footer> are "semantic" tags — they tell browsers,
+    <article>, <nav>, <footer> are "semantic" tags, they tell browsers,
     search engines, and screen readers what each chunk of the page IS.
     A <div> means nothing; it's just a box. Use semantic tags by default.
 -->
 <html lang="en" data-theme="dark">
 <head>
   <!-- charset MUST come first: it tells the browser how to decode every byte
-       after it. Without it, characters like — and é can render as mojibake. -->
+       after it. Without it, accented characters like é can render as mojibake. -->
   <meta charset="utf-8">
 
   <!-- The single most important line for mobile. Without it, phones pretend
-       to be a 980px-wide desktop and shrink the page to fit — your responsive
+       to be a 980px-wide desktop and shrink the page to fit, your responsive
        CSS would never activate and everything would look tiny. -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Shows in the browser tab and as the headline in search results. -->
-  <title>Noah Jones — Software QA Engineer &amp; Game Developer</title>
+  <title>Noah Jones · Software QA Engineer &amp; Game Developer</title>
   <!-- The grey text under your title in Google results. Aim for ~155
        characters; longer gets truncated with an ellipsis. -->
   <meta name="description" content="Portfolio of Noah Jones: Software QA Engineer specialising in test automation frameworks (Python, C#, Selenium, Playwright, Appium) and indie game developer at NoJo Studios.">
@@ -67,10 +67,10 @@
 
   <!-- Open Graph: controls the preview card when someone pastes your link
        into LinkedIn, Slack, Discord, or iMessage. Without these, the preview
-       falls back to whatever text the scraper finds first — usually the nav. -->
+       falls back to whatever text the scraper finds first, usually the nav. -->
   <!-- Worth adding later: <meta property="og:image" content="..."> pointing
        at a 1200x630 PNG. That's what turns a plain link into a big card. -->
-  <meta property="og:title" content="Noah Jones — Software QA Engineer &amp; Game Developer">
+  <meta property="og:title" content="Noah Jones · Software QA Engineer &amp; Game Developer">
   <meta property="og:description" content="Test automation frameworks, desktop apps, and Unreal Engine 5 games.">
   <meta property="og:type" content="website">
 
@@ -84,7 +84,7 @@
   <!--
     Progressive enhancement. The detail panels are collapsed by JS. If JS
     never runs, there'd be no way to open them and the GitHub links inside
-    would be unreachable — so without JS we force every panel open and hide
+    would be unreachable, so without JS we force every panel open and hide
     the toggle buttons. The content is always reachable either way.
   -->
   <noscript>
@@ -107,14 +107,14 @@
         var saved = localStorage.getItem('theme');
         var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
         document.documentElement.dataset.theme = saved || (prefersLight ? 'light' : 'dark');
-      } catch (e) { /* private browsing can block localStorage — dark stays the default */ }
+      } catch (e) { /* private browsing can block localStorage, so dark stays the default */ }
     })();
   </script>
 </head>
 
 <body>
   <!--
-    SKIP LINK — accessibility
+    SKIP LINK, accessibility
     Must be the FIRST focusable thing on the page. It sits off-screen until a
     keyboard user presses Tab, then slides into view. Without it, keyboard and
     screen-reader users have to tab through every nav link on every visit
@@ -123,10 +123,10 @@
   <a class="skip-link" href="#main">Skip to content</a>
 
   <!--
-    BACKGROUND BLOBS — decoration only
+    BACKGROUND BLOBS, decoration only
     Three big blurred circles that drift slowly behind everything (styled and
     animated in styles.css section 3). They're empty spans because they carry
-    no meaning — all the visual work is done in CSS.
+    no meaning, all the visual work is done in CSS.
 
     aria-hidden="true" hides them from screen readers. Announcing three empty
     decorative shapes would be pure noise. Rule: decorative -> aria-hidden;
@@ -140,7 +140,7 @@
 
   <!--
     ==========================================================================
-    NAVIGATION — sticky header
+    NAVIGATION, sticky header
     ==========================================================================
     Stays pinned to the top as you scroll (position: sticky in CSS). Picks up
     a blurred translucent background once you scroll down, via the .is-scrolled
@@ -183,19 +183,19 @@
     </button>
   </header>
 
-  <!-- <main> marks the primary content — exactly one per page. This is the
+  <!-- <main> marks the primary content, exactly one per page. This is the
        target of the skip link above. -->
   <main id="main">
     <!--
       ==========================================================================
-      HERO — the first screen
+      HERO, the first screen
       ==========================================================================
       Deliberately shorter than a full screen height so a sliver of the stats
       row peeks above the fold, signalling there's more below.
 
       The <h1> is split into two <span class="hero__line">s so "Noah" and
       "Jones" stack, and so the second can carry the animated gradient.
-      There is exactly ONE <h1> on the page — it's the document's title in the
+      There is exactly ONE <h1> on the page, it's the document's title in the
       heading outline, not just "the biggest text".
       ==========================================================================
     -->
@@ -208,9 +208,9 @@
       </h1>
 
       <p class="hero__lede reveal">
-        I break software on purpose so it doesn't break on you. I build clean,
-        maintainable automation frameworks in <strong>Python</strong> and
-        <strong>C#</strong> — and when the tests are green, I make games in
+        I break software on purpose so it doesn't break on you. Most days that
+        means building test automation in <strong>Python</strong> and
+        <strong>C#</strong>. When the tests go green, I go build games in
         <strong>Unreal Engine&nbsp;5</strong>.
       </p>
 
@@ -224,7 +224,7 @@
 
       <!--
         STAT COUNTERS
-        <dl> is a "description list" — the right tag for label/value pairs.
+        <dl> is a "description list", the right tag for label/value pairs.
         <dt> is the term (the label), <dd> is the definition (the number).
 
         Each <dd> holds "0" in the markup and carries the real figure in
@@ -261,7 +261,7 @@
 
     <!--
       ==========================================================================
-      ABOUT — bio and quick facts
+      ABOUT, bio and quick facts
       ==========================================================================
       Two columns on desktop (prose + facts panel), stacking to one on narrow
       screens. The <aside> is the right tag for the facts panel: it's related
@@ -282,15 +282,15 @@
             reports someone can actually act on.
           </p>
           <p>
-            My day-to-day is automated, manual, and API testing across web and mobile —
-            Selenium, Playwright, and Appium, wired up with NUnit, XUnit, Pytest, and
-            Behave. I care less about clever test code and more about frameworks the
-            next person can pick up without a tour guide.
+            Day to day I'm doing automated, manual, and API testing across web and
+            mobile. Selenium, Playwright, and Appium, wired up with NUnit, XUnit,
+            Pytest, and Behave. I care less about clever test code than about
+            frameworks the next person can pick up without a tour guide.
           </p>
           <p>
             Outside of QA I build things for fun: cross-platform desktop tools, and
-            indie games under <strong>NoJo&nbsp;Studios</strong> using Unreal Engine 5
-            and Unity. Game dev turns out to be a sneaky-good QA teacher — nothing
+            indie games under <strong>NoJo&nbsp;Studios</strong> in Unreal Engine 5
+            and Unity. Game dev turns out to be a sneaky-good QA teacher. Nothing
             finds your edge cases faster than handing a build to a player.
           </p>
         </div>
@@ -315,7 +315,7 @@
 
     <!--
       ==========================================================================
-      WORK — GitHub projects
+      WORK. GitHub projects
       ==========================================================================
       Filter chips + a responsive grid of project cards.
 
@@ -337,7 +337,7 @@
 
       THE ONE THING THAT MUST BE UNIQUE
         The button's  aria-controls="d-xyz"  must match the panel's  id="d-xyz",
-        and no other card may use that id. Duplicate ids break the accordion —
+        and no other card may use that id. Duplicate ids break the accordion, so
         clicking one card would toggle another. Use a short name based on the
         project, e.g. id="d-behave".
       ==========================================================================
@@ -347,21 +347,21 @@
         <span class="section__num">02</span>
         <h2 class="section__title">Work</h2>
         <p class="section__sub">
-          Every project below is a real, public repository. Hit
-          <em>Details</em> on any card to open it up.
+          Everything below is a real, public repo. Hit <em>Details</em> on any
+          card to dig in.
         </p>
       </div>
 
       <!--
         FILTER CHIPS
-        Real <button>s, not styled <div>s — buttons are focusable, respond to
+        Real <button>s, not styled <div>s, buttons are focusable, respond to
         Enter and Space for free, and are announced correctly by screen readers.
 
         role="group" + aria-label tells assistive tech these belong together
         and what they're for. (role="tablist" would be wrong: these don't
         switch between panels, they filter one list in place.)
 
-        type="button" matters — the default for a <button> is type="submit",
+        type="button" matters, the default for a <button> is type="submit",
         which would try to submit a form if one ever wrapped these.
       -->
       <div class="filters reveal" id="filters" role="group" aria-label="Filter projects by category">
@@ -372,12 +372,12 @@
       </div>
 
       <!--
-        FILTER STATUS — accessibility
+        FILTER STATUS, accessibility
         Deliberately empty; script.js writes "Showing 2 projects..." into it.
 
         aria-live="polite" makes a screen reader announce that text whenever it
         changes. Without this, clicking a filter is completely SILENT to a
-        non-sighted user — cards vanish with no feedback at all. Any time your
+        non-sighted user, cards vanish with no feedback at all. Any time your
         JavaScript changes the page in a way that's only visible, say it here.
       -->
       <p class="filter-status" id="filterStatus" role="status" aria-live="polite"></p>
@@ -386,7 +386,7 @@
 
         <!--
           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          REFERENCE CARD — fully annotated. The seven cards after this one
+          REFERENCE CARD, fully annotated. The seven cards after this one
           follow the identical structure with comments trimmed. Copy THIS one
           when adding a project.
           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -406,12 +406,12 @@
 
           <header class="card__head">
             <!-- Emoji as an icon. aria-hidden because the heading beside it
-                 already says what this is — otherwise a screen reader would
+                 already says what this is, otherwise a screen reader would
                  announce "memo, Practice Test Tool". -->
             <span class="card__icon" aria-hidden="true">📝</span>
             <div>
               <!-- <h3> because the section's <h2> is "Work". Never pick a
-                   heading level for its size — that's what CSS is for. -->
+                   heading level for its size, that's what CSS is for. -->
               <h3 class="card__title">Practice Test Tool</h3>
               <!-- The coloured dot is language-branded (see .dot--* in CSS).
                    Note the language is also written in text: colour alone must
@@ -422,8 +422,8 @@
 
           <!-- One or two sentences. This is what a visitor skims. -->
           <p class="card__desc">
-            A cross-platform desktop app for taking practice quizzes of any kind —
-            designed in Claude Design, then built in Claude Code.
+            A cross-platform desktop app for taking practice quizzes of any kind.
+            Designed in Claude Design, then built in Claude Code.
           </p>
 
           <!-- A list of technologies, so <ul>/<li> rather than a row of spans. -->
@@ -433,10 +433,10 @@
 
           <!--
             ACCORDION TRIGGER
-            aria-expanded="false" — script.js flips this to "true" on open, and
+            aria-expanded="false", script.js flips this to "true" on open, and
               that is what makes a screen reader announce "expanded"/"collapsed".
               The rotating chevron only helps people who can see it.
-            aria-controls  — points at the id of the panel this button opens.
+            aria-controls  - points at the id of the panel this button opens.
                              Must match the panel's id below, and be unique.
             The chevron is inline SVG so it inherits the text colour via
             stroke="currentColor" and rotates with a CSS transform.
@@ -448,11 +448,11 @@
 
           <!--
             ACCORDION PANEL
-            hidden      — collapsed before JavaScript runs; script.js removes
+            hidden      - collapsed before JavaScript runs; script.js removes
                           this and hands control to CSS. The <noscript> block
                           in <head> force-opens panels if JS never loads, so
                           the GitHub link inside is always reachable.
-            role="region" — marks the revealed content as a navigable landmark.
+            role="region", marks the revealed content as a navigable landmark.
             The inner <div> is REQUIRED: the 0fr-to-1fr height animation needs
             a child to clip with overflow: hidden. Don't remove it.
           -->
@@ -460,20 +460,20 @@
             <div class="accordion__inner">
               <h4>What it does</h4>
               <p>
-                Lets you build and sit practice tests at home for any subject — load a
-                question set, run a timed quiz, and review what you got wrong.
+                Lets you build and sit practice tests at home for any subject. Load a
+                question set, run a timed quiz, then review what you got wrong.
               </p>
               <h4>Why it's interesting</h4>
               <p>
-                This one was a deliberate experiment in a <em>design-first</em> AI workflow:
-                the interface was designed in Claude Design, and those requirements were
-                handed to Claude Code to produce the finished desktop application. It's a
+                This one was a deliberate experiment in a <em>design-first</em> AI
+                workflow. The interface got designed in Claude Design, then those
+                requirements went to Claude Code to build the finished app. A
                 practical look at where AI tooling actually fits in a build pipeline.
               </p>
               <h4>Highlights</h4>
               <ul class="bullets">
                 <li>Runs natively on multiple desktop platforms</li>
-                <li>Subject-agnostic — any question set works</li>
+                <li>Works with any question set, on any subject</li>
                 <li>Design-to-code handoff driven by AI tooling</li>
               </ul>
               <a class="btn btn--small btn--primary" href="https://github.com/noah-jones-dev/PracticeTestTool" target="_blank" rel="noopener noreferrer">View on GitHub ↗</a>
@@ -492,8 +492,8 @@
             </div>
           </header>
           <p class="card__desc">
-            A small counter and calculator that lives in your system tray — built
-            end-to-end with Claude Code.
+            A small counter and calculator that lives in your system tray, built
+            end to end with Claude Code.
           </p>
           <ul class="tags">
             <li>JavaScript</li><li>CSS</li><li>System tray</li><li>AI-assisted</li>
@@ -513,13 +513,13 @@
               <h4>Why it's interesting</h4>
               <p>
                 A focused study in shipping something small and complete. Tray apps look
-                trivial until you hit real platform behaviour — window lifecycle, focus,
+                trivial until you hit real platform behaviour: window lifecycle, focus,
                 and staying out of the user's way.
               </p>
               <h4>Highlights</h4>
               <ul class="bullets">
                 <li>Native cross-platform desktop build</li>
-                <li>Lives in the tray — always available, never in the way</li>
+                <li>Lives in the tray, always there but never in the way</li>
                 <li>Built start-to-finish as an AI pair-programming exercise</li>
               </ul>
               <a class="btn btn--small btn--primary" href="https://github.com/noah-jones-dev/CounterApp" target="_blank" rel="noopener noreferrer">View on GitHub ↗</a>
@@ -533,7 +533,7 @@
           <header class="card__head">
             <span class="card__icon" aria-hidden="true">🥒</span>
             <div>
-              <h3 class="card__title">Web Automation — Behave BDD</h3>
+              <h3 class="card__title">Web Automation with Behave</h3>
               <p class="card__meta"><span class="dot dot--py"></span>Python · BDD</p>
             </div>
           </header>
@@ -553,9 +553,9 @@
             <div class="accordion__inner">
               <h4>What it does</h4>
               <p>
-                Automates modern web applications using the Behave BDD framework, with
-                scenarios written in Gherkin — <code>Given / When / Then</code> — so
-                non-engineers can read and review the test suite.
+                Automates modern web apps with the Behave BDD framework. Scenarios are
+                written in Gherkin (<code>Given / When / Then</code>), so non-engineers
+                can read and review the suite.
               </p>
               <h4>Why it's interesting</h4>
               <p>
@@ -582,7 +582,7 @@
           <header class="card__head">
             <span class="card__icon" aria-hidden="true">🐍</span>
             <div>
-              <h3 class="card__title">Web Automation — Pytest</h3>
+              <h3 class="card__title">Web Automation with Pytest</h3>
               <p class="card__meta"><span class="dot dot--py"></span>Python · Pytest</p>
             </div>
           </header>
@@ -608,8 +608,8 @@
               <h4>Why it's interesting</h4>
               <p>
                 Pytest gives you enough rope to build something elegant or something
-                unmaintainable. This project is the case for the former: shared setup
-                lives in fixtures, assertions stay readable, and the suite scales without
+                unmaintainable. This one aims for elegant: shared setup lives in
+                fixtures, assertions stay readable, and the suite scales without
                 copy-paste.
               </p>
               <h4>Highlights</h4>
@@ -629,7 +629,7 @@
           <header class="card__head">
             <span class="card__icon" aria-hidden="true">🎯</span>
             <div>
-              <h3 class="card__title">Web Automation — NUnit</h3>
+              <h3 class="card__title">Web Automation with NUnit</h3>
               <p class="card__meta"><span class="dot dot--cs"></span>C# · NUnit</p>
             </div>
           </header>
@@ -675,12 +675,12 @@
           <header class="card__head">
             <span class="card__icon" aria-hidden="true">🎭</span>
             <div>
-              <h3 class="card__title">Playwright Web Automation — XUnit</h3>
+              <h3 class="card__title">Playwright Automation with XUnit</h3>
               <p class="card__meta"><span class="dot dot--cs"></span>C# · Playwright</p>
             </div>
           </header>
           <p class="card__desc">
-            Browser automation with Playwright and C#, using XUnit — the modern
+            Browser automation with Playwright and C#, using XUnit. It's the modern
             alternative to Selenium, with auto-waiting built in.
           </p>
           <ul class="tags">
@@ -722,7 +722,7 @@
           <header class="card__head">
             <span class="card__icon" aria-hidden="true">📱</span>
             <div>
-              <h3 class="card__title">Mobile Automation — Python</h3>
+              <h3 class="card__title">Mobile Automation in Python</h3>
               <p class="card__meta"><span class="dot dot--py"></span>Python · Appium</p>
             </div>
           </header>
@@ -768,13 +768,13 @@
           <header class="card__head">
             <span class="card__icon" aria-hidden="true">🤖</span>
             <div>
-              <h3 class="card__title">Mobile Automation — C#</h3>
+              <h3 class="card__title">Mobile Automation in C#</h3>
               <p class="card__meta"><span class="dot dot--cs"></span>C# · Appium</p>
             </div>
           </header>
           <p class="card__desc">
-            The same cross-platform mobile coverage from the .NET side — Appium and
-            C#, structured around best practices.
+            The same cross-platform mobile coverage from the .NET side, using Appium
+            and C#.
           </p>
           <ul class="tags">
             <li>C#</li><li>Appium</li><li>.NET</li><li>Cross-platform</li>
@@ -793,9 +793,9 @@
               </p>
               <h4>Why it's interesting</h4>
               <p>
-                Paired with the Python version, this shows the same testing strategy
-                expressed in two ecosystems — useful evidence that the thinking, not the
-                syntax, is the transferable part.
+                Paired with the Python version, this shows the same testing strategy in
+                two ecosystems. Good evidence that the thinking, not the syntax, is the
+                transferable part.
               </p>
               <h4>Highlights</h4>
               <ul class="bullets">
@@ -818,7 +818,7 @@
 
     <!--
       ==========================================================================
-      GAMES — NoJo Studios (itch.io)
+      GAMES. NoJo Studios (itch.io)
       ==========================================================================
       Same card component as Work, plus a .card__art panel on top and no
       data-cat (the filter chips only apply to the Work grid).
@@ -857,7 +857,7 @@
             </div>
           </header>
           <p class="card__desc">
-            You're a CRC Specialist — and a prankster at heart. Find ways to entertain
+            You're a CRC Specialist, and a prankster at heart. Find ways to entertain
             yourself when the workday drags.
           </p>
           <ul class="tags">
@@ -877,7 +877,7 @@
               </p>
               <h4>Built with</h4>
               <p>
-                Unreal Engine 5 — level design, gameplay systems, and interaction
+                Unreal Engine 5. Level design, gameplay systems, and interaction
                 scripting.
               </p>
               <a class="btn btn--small btn--primary" href="https://nojo-studios.itch.io/" target="_blank" rel="noopener noreferrer">Play on itch.io ↗</a>
@@ -915,7 +915,7 @@
               </p>
               <h4>Built with</h4>
               <p>
-                Unreal Engine 5 — environment design, player interaction, and
+                Unreal Engine 5. Environment design, player interaction, and
                 systems-driven gameplay.
               </p>
               <a class="btn btn--small btn--primary" href="https://nojo-studios.itch.io/" target="_blank" rel="noopener noreferrer">Play on itch.io ↗</a>
@@ -924,7 +924,7 @@
         </article>
 
         <!--
-          GAME CARD 3 — Bored Kids Ding Dong Ditching Houses
+          GAME CARD 3. Bored Kids Ding Dong Ditching Houses
           Same structure as the two above. To add a fourth game, copy this
           whole <article> and change: the title, the description, the tags,
           the card__art--* class, and BOTH the aria-controls on the button
@@ -961,8 +961,8 @@
               </p>
               <h4>Built with</h4>
               <p>
-                Unreal Engine 5 — neighbourhood level design, stealth and escape
-                mechanics, and NPC reactions.
+                Unreal Engine 5. Neighbourhood level design, stealth and escape mechanics,
+                and NPC reactions.
               </p>
               <a class="btn btn--small btn--primary" href="https://nojo-studios.itch.io/" target="_blank" rel="noopener noreferrer">Play on itch.io ↗</a>
             </div>
@@ -979,10 +979,10 @@
 
     <!--
       ==========================================================================
-      SKILLS — grouped capability lists
+      SKILLS, grouped capability lists
       ==========================================================================
       Six groups in an auto-fitting grid, each a simple <ul> of pills. Content
-      mirrors the skills list on the GitHub profile README — when you update
+      mirrors the skills list on the GitHub profile README, when you update
       one, update the other so they don't drift apart.
 
       To add a group: copy a whole <div class="skillgroup">. The grid reflows
@@ -1058,7 +1058,7 @@
 
     <!--
       ==========================================================================
-      CONTACT — four outbound links
+      CONTACT, four outbound links
       ==========================================================================
       Plain links, not a form. A contact form on a static site needs a backend
       or a third-party service to actually deliver mail; links work everywhere
@@ -1079,7 +1079,7 @@
         <span class="section__num">05</span>
         <h2 class="section__title">Get in touch</h2>
         <p class="section__sub">
-          Open to QA engineering and test automation roles — and always happy to
+          Open to QA engineering and test automation roles, and always happy to
           talk about games.
         </p>
       </div>
@@ -1101,18 +1101,18 @@
           <span class="contactcard__value">NoJo Studios</span>
         </a>
         <!--
-          EMAIL CARD — two actions in one card
+          EMAIL CARD, two actions in one card
 
           Tapping the card opens the visitor's mail app (mailto:). But plenty
           of people have no mail client configured, especially on a desktop
-          browser — for them a mailto: link appears to do nothing at all. So
+          browser, for them a mailto: link appears to do nothing at all. So
           there's also a copy button.
 
           WHY THIS ISN'T A SINGLE <a>: a <button> cannot be nested inside an
           <a>. Nested interactive elements are invalid HTML and browsers and
           screen readers handle them unpredictably. So the card is a plain
-          <div> holding two separate controls — the link and the button —
-          each independently focusable and each announced correctly.
+          <div> holding two separate controls, the link and the button, each
+          independently focusable and each announced correctly.
         -->
         <div class="contactcard contactcard--email">
           <a class="contactcard__main" href="mailto:noahsjones2023@gmail.com">
@@ -1122,8 +1122,8 @@
           </a>
 
           <!--
-            data-copy holds the text to copy, so script.js stays generic —
-            put this attribute on any button and copying just works.
+            data-copy holds the text to copy, so script.js stays generic. Put this
+            attribute on any button and copying just works.
             aria-label because the button's only content is an icon.
           -->
           <button class="copybtn" type="button"
@@ -1176,8 +1176,8 @@
         <span class="section__num">06</span>
         <h2 class="section__title">R&eacute;sum&eacute;</h2>
         <p class="section__sub">
-          The preview below is the live file from my Drive &mdash; whenever I
-          update it, this page shows the new version straight away.
+          The preview below is the live file from my Drive. Whenever I update it,
+          this page shows the new version straight away.
         </p>
       </div>
 
@@ -1190,8 +1190,8 @@
         -->
         <div class="resume__viewer">
           <p class="resume__fallback">
-            The preview couldn&rsquo;t load here &mdash; use
-            <strong>Download PDF</strong> or <strong>Open in Drive</strong>.
+            The preview couldn&rsquo;t load here. Use <strong>Download PDF</strong>
+            or <strong>Open in Drive</strong> instead.
           </p>
           <iframe
             class="resume__frame"
@@ -1202,7 +1202,7 @@
         </div>
 
         <aside class="resume__side">
-          <h3 class="resume__title">Noah Jones &mdash; QA Engineer</h3>
+          <h3 class="resume__title">Noah Jones, QA Engineer</h3>
           <p class="resume__note">
             Software QA &amp; test automation. Python, C#, Selenium,
             Playwright, Appium.
@@ -1235,7 +1235,7 @@
   </footer>
 
   <!--
-    TOAST — the "Copied!" message
+    TOAST, the "Copied!" message
     Empty until JavaScript writes into it.
 
     role="status" + aria-live="polite" is what makes a screen reader announce
