@@ -213,6 +213,24 @@ It shows a toast, swaps to a tick for a moment, and falls back to the legacy
 copy method when the modern Clipboard API isn't available (e.g. over plain
 `http://` or from a `file://` path).
 
+### Update your résumé
+
+**Do it in Google Drive, not here.** The site embeds one Drive file by its ID,
+and Drive serves whatever that file currently contains:
+
+> Drive → right-click the PDF → **File information** → **Manage versions**
+> → **Upload new version**
+
+The file ID stays the same, so the preview and the download button both show
+the new version immediately. No commit, no deploy.
+
+**The trap:** uploading a *new* file per version (`Resume 2025.9`,
+`Resume 2026`, …). Each new file gets a new ID, the page keeps pointing at the
+old one, and the site quietly goes stale. Same file, new version.
+
+The PDF must be shared as **Anyone with the link → Viewer**, or visitors get a
+Google sign-in wall instead of the document.
+
 ### Add a nav link
 
 Add an `<a href="#yourSection">` inside `.nav__links`. Smooth scrolling and the

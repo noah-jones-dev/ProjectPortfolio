@@ -13,6 +13,7 @@
      8.  Cards + accordion  — project & game cards, filter chips, expanders
      9.  Skills             — skill group boxes and pills
      10. Contact            — contact cards with the gradient hover wash
+     10b Resume             — live Drive PDF embed + details panel
      11. Footer
      12. Reveal-on-scroll   — the fade-up animation states
      13. Reduced motion     — accessibility override, MUST stay last-ish
@@ -1284,6 +1285,89 @@ code {
 .toast--error::before { background: #F59E0B; }
 
 
+/* ======================= 10b. RESUME ======================= */
+
+/*
+  Two columns: the live PDF preview, and a details panel beside it.
+  Collapses to one column on narrow screens (see section 14).
+*/
+.resume {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 1.15rem;
+  align-items: start;
+}
+
+/*
+  THE VIEWER
+
+  aspect-ratio reserves the right shape before the PDF loads, so the page
+  doesn't jump when the embed appears. 1 / 1.294 is US Letter proportions
+  (8.5 x 11), which is what the document actually is.
+*/
+.resume__viewer {
+  position: relative;
+  aspect-ratio: 1 / 1.294;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.resume__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  /* The PDF itself is white; give it a white bed so a dark-theme edge
+     doesn't show as a grey band around the page. */
+  background: #fff;
+}
+
+/*
+  The fallback sits BEHIND the iframe (no z-index, so it paints first).
+  When Drive loads, the opaque iframe covers it completely. When the embed
+  is blocked, this is what remains visible.
+*/
+.resume__fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  margin: 0;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+}
+.resume__fallback strong { color: var(--text); }
+
+.resume__side {
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transition: transform var(--dur) var(--ease),
+              border-color var(--dur) var(--ease);
+}
+.resume__side:hover { transform: translateY(-4px); border-color: var(--border-lit); }
+
+.resume__title { font-size: 1.05rem; margin-bottom: 0.35rem; }
+.resume__note  { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1.1rem; }
+
+.resume__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1.2rem;
+}
+/* Full-width buttons read as a clear stack of actions rather than a
+   ragged row, and give a comfortable tap target on a phone. */
+.resume__actions .btn { flex: 1 1 100%; justify-content: center; }
+
+
 /* ============================ 11. FOOTER ============================ */
 
 .footer {
@@ -1361,7 +1445,10 @@ code {
 
 /* --- Tablet: the About panel no longer has room beside the prose --- */
 @media (max-width: 880px) {
-  .about { grid-template-columns: 1fr; }
+  .about  { grid-template-columns: 1fr; }
+  /* The PDF becomes unreadably small beside a sidebar at this width. */
+  .resume { grid-template-columns: 1fr; }
+  .resume__side { order: -1; }   /* actions first, then the document */
 }
 
 /* --- Phone: single column, bigger tap targets --- */

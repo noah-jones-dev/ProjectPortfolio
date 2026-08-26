@@ -29,6 +29,7 @@
       #games        3 NoJo Studios game cards
       #skills       6 skill groups + specialties banner
       #contact      4 contact cards
+      #resume       live PDF preview, always the current file
     <footer>        copyright + back-to-top
 
   HOW TO EDIT THIS FILE
@@ -162,6 +163,7 @@
       <a href="#games">Games</a>
       <a href="#skills">Skills</a>
       <a href="#contact">Contact</a>
+      <a href="#resume">R&eacute;sum&eacute;</a>
     </nav>
 
     <!--
@@ -1138,6 +1140,93 @@
         </div>
       </div>
     </section>
+
+    <!--
+      ==========================================================================
+      RESUME - the live document, always current
+      ==========================================================================
+      HOW THIS STAYS UP TO DATE
+
+      Every URL below points at ONE Google Drive file, identified by its file
+      ID. Drive serves whatever that file currently contains, so updating the
+      resume is done in Drive, NOT here:
+
+        Drive -> right-click the PDF -> File information -> Manage versions
+              -> UPLOAD NEW VERSION
+
+      That replaces the contents while keeping the same file ID, so this page,
+      the embedded preview, and the download button all show the new version
+      immediately. Nothing to rebuild, nothing to redeploy.
+
+      The trap to avoid: uploading a NEW file per version (Resume 2025.9,
+      Resume 2026, ...). Each new file gets a NEW id, this page keeps pointing
+      at the old one, and the site quietly goes stale. Same file, new version.
+
+      THE FILE ID appears three times below. It only ever changes if you
+      abandon this Drive file entirely:
+
+        1Skl0XFSZrnjYQtVNuFlTmA_cxldlG9tO
+
+      The file must be shared as "Anyone with the link -> Viewer", or visitors
+      see a Google sign-in wall instead of the document.
+      ==========================================================================
+    -->
+    <section class="section section--resume" id="resume">
+      <div class="section__head reveal">
+        <span class="section__num">06</span>
+        <h2 class="section__title">R&eacute;sum&eacute;</h2>
+        <p class="section__sub">
+          The preview below is the live file from my Drive &mdash; whenever I
+          update it, this page shows the new version straight away.
+        </p>
+      </div>
+
+      <div class="resume reveal">
+        <!--
+          The fallback paragraph sits UNDER the iframe. If Drive loads, the
+          iframe covers it; if the embed is blocked (strict privacy settings,
+          an offline viewer, a Content-Security-Policy), the message and the
+          buttons beside it are still there. The document is never a dead end.
+        -->
+        <div class="resume__viewer">
+          <p class="resume__fallback">
+            The preview couldn&rsquo;t load here &mdash; use
+            <strong>Download PDF</strong> or <strong>Open in Drive</strong>.
+          </p>
+          <iframe
+            class="resume__frame"
+            src="https://drive.google.com/file/d/1Skl0XFSZrnjYQtVNuFlTmA_cxldlG9tO/preview"
+            title="Noah Jones r&eacute;sum&eacute; (PDF preview)"
+            loading="lazy"
+            referrerpolicy="no-referrer"></iframe>
+        </div>
+
+        <aside class="resume__side">
+          <h3 class="resume__title">Noah Jones &mdash; QA Engineer</h3>
+          <p class="resume__note">
+            Software QA &amp; test automation. Python, C#, Selenium,
+            Playwright, Appium.
+          </p>
+          <ul class="factlist">
+            <li><span>Format</span><strong>PDF &middot; 1 page</strong></li>
+            <li><span>Source</span><strong>Live from Google Drive</strong></li>
+            <li><span>Updates</span><strong>Automatically with the file</strong></li>
+          </ul>
+          <div class="resume__actions">
+            <a class="btn btn--small btn--primary"
+               href="https://drive.google.com/uc?export=download&amp;id=1Skl0XFSZrnjYQtVNuFlTmA_cxldlG9tO">
+              Download PDF
+            </a>
+            <a class="btn btn--small btn--ghost"
+               href="https://drive.google.com/file/d/1Skl0XFSZrnjYQtVNuFlTmA_cxldlG9tO/view?usp=sharing"
+               target="_blank" rel="noopener noreferrer">
+              Open in Drive &#8599;
+            </a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
   </main>
 
   <footer class="footer">
