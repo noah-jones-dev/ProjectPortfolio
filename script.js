@@ -1,5 +1,5 @@
 /* =========================================================================
-   Noah Jones — Portfolio behaviour
+   Noah Jones · Portfolio behaviour
    =========================================================================
 
    CONTENTS
@@ -18,7 +18,7 @@
    HOW THIS FILE IS ORGANISED
      Nine small, INDEPENDENT features, each in its own function, all called
      at the very bottom. Nothing here depends on anything else here. If one
-     breaks, the other eight keep working — that is the entire reason for
+     breaks, the other eight keep working. That is the entire reason for
      the structure, and it's worth copying in your own projects.
 
    THE DIVISION OF LABOUR WITH CSS
@@ -72,7 +72,7 @@ const prefersReducedMotion =
  *   3. Otherwise, dark.
  *
  * The initial read happens in the inline <script> in index.html's <head>,
- * NOT here — see the comment there for why.
+ * NOT here. See the comment there for why.
  * ------------------------------------------------------------------ */
 function initTheme() {
   const toggle = document.getElementById('themeToggle');
@@ -89,7 +89,7 @@ function initTheme() {
       localStorage.setItem('theme', next);
     } catch (e) {
       /* Private browsing can block storage. The toggle still works for
-         this session — it just won't be remembered. Fail quietly. */
+         this session; it just won't be remembered. Fail quietly. */
     }
   });
 
@@ -195,8 +195,8 @@ function initReveal() {
  *
  *   CSS cannot animate height: auto. It needs two concrete numbers to
  *   interpolate between, and "auto" isn't one. The workaround is to make
- *   the panel a grid and animate its single row from 0fr to 1fr —
- *   fractions ARE numbers, so they animate, and the content still sizes
+ *   the panel a grid and animate its single row from 0fr to 1fr.
+ *   Fractions ARE numbers, so they animate, and the content still sizes
  *   itself naturally. No measuring heights in JavaScript, no hardcoded
  *   pixel values that break when you edit the text.
  *
@@ -302,7 +302,7 @@ function initCounters() {
 
     const step = (now) => {
       const progress = Math.min((now - start) / duration, 1);
-      // easeOutCubic — fast at first, gently settling. Linear feels robotic.
+      // easeOutCubic, fast at first, gently settling. Linear feels robotic.
       const eased = 1 - Math.pow(1 - progress, 3);
 
       el.textContent = String(Math.round(target * eased));
@@ -373,7 +373,7 @@ function showToast(message, isError) {
   toast.classList.add('is-visible');
 
   // Reset any countdown already running, so rapid clicks don't hide the
-  // toast early — each new message gets the full display time.
+  // toast early, each new message gets the full display time.
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2200);
 }
@@ -388,7 +388,7 @@ function showToast(message, isError) {
  * TWO WAYS TO COPY, because one isn't enough:
  *
  *   navigator.clipboard  is the modern API, but it only exists in a
- *                        "secure context" — https:// or localhost. Open
+ *                        "secure context", https:// or localhost. Open
  *                        the page as a file:// and it is undefined.
  *   execCommand('copy')  is the deprecated fallback that still works
  *                        essentially everywhere, including file://.
@@ -407,7 +407,7 @@ function copyText(text) {
   return new Promise((resolve, reject) => {
     const helper = document.createElement('textarea');
     helper.value = text;
-    // Off-screen rather than display:none — the browser can't select text
+    // Off-screen rather than display:none, the browser can't select text
     // inside an element it isn't rendering.
     helper.setAttribute('readonly', '');
     helper.style.position = 'fixed';
@@ -445,7 +445,7 @@ function initCopyButtons() {
         .then(() => {
           showToast('Copied ' + text);
 
-          // Icon swaps to a tick, then back. Purely visual — the toast is
+          // Icon swaps to a tick, then back. Purely visual, the toast is
           // what actually announces success to assistive tech.
           button.classList.add('is-copied');
           setTimeout(() => button.classList.remove('is-copied'), 1800);
@@ -471,11 +471,11 @@ function initMisc() {
 
 
 /* ------------------------------------------------------------------ *
- * GO — start everything
+ * GO, start everything
  * ------------------------------------------------------------------
  * No DOMContentLoaded wrapper is needed because index.html loads this with
  * <script src="script.js" defer>. `defer` downloads the file in parallel
- * with parsing the HTML, then runs it once the document is fully parsed —
+ * with parsing the HTML, then runs it once the document is fully parsed,
  * so every element these functions look for already exists.
  *
  * Without `defer`, the browser would stop parsing the page to fetch and run
