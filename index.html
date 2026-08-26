@@ -79,7 +79,22 @@
        Swap that number for a different emoji's code point to change it. -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127918;</text></svg>">
 
-  <link rel="stylesheet" href="styles.css">
+  <!--
+    CACHE BUSTING: the ?v= number.
+
+    Browsers cache styles.css and script.js hard, keyed on the URL. Change the
+    file but not the URL and a returning visitor keeps the OLD copy, sometimes
+    for hours. That is why an updated site can look unchanged after a refresh.
+
+    Adding ?v=N makes it a different URL, so the browser has to fetch it fresh.
+    The query string is ignored by the server; the file served is the same.
+
+    BUMP THE NUMBER in BOTH places (here and on script.js at the bottom of
+    this file) whenever you change CSS or JS. Bigger sites automate this by
+    putting a content hash in the filename; a hand-bumped number does the same
+    job for three files.
+  -->
+  <link rel="stylesheet" href="styles.css?v=7">
 
   <!--
     Progressive enhancement. The detail panels are collapsed by JS. If JS
@@ -1246,6 +1261,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- defer = download now, run after the HTML is parsed. Keeps the page fast. -->
-  <script src="script.js" defer></script>
+  <script src="script.js?v=7" defer></script>
 </body>
 </html>

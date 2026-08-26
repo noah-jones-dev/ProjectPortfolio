@@ -2,7 +2,7 @@
 
 > [!note]
 > **Site link**: 
-> [portfolio site](http://noah-jones-dev.github.io/ProjectPortfolio)
+> [portfolio site](https://noah-jones-dev.github.io/ProjectPortfolio)
 
 A personal portfolio site covering my QA engineering work, desktop apps, and
 Unreal Engine 5 games. Built with plain HTML, CSS, and JavaScript — no
@@ -325,6 +325,27 @@ Something is overriding `box-sizing: border-box`.
 
 **Text is tiny on mobile.**
 The `<meta name="viewport">` tag was removed from `<head>`.
+
+**I merged a change but the live site looks the same.**
+Work through it in order, because three different things can cause this:
+
+1. **Is it merged?** The live site only ever serves what's on `main`. A branch
+   or an open PR is not deployed.
+2. **Did the deploy run?** Repo → **Actions** → the newest
+   *pages build and deployment* should be green, and its commit should be your
+   merge. It takes about a minute.
+3. **Is it your browser?** Almost always the answer once 1 and 2 are fine.
+   Load `https://noah-jones-dev.github.io/ProjectPortfolio/?v=2` — the query
+   string forces a fresh copy. If the change is there, it was cache.
+
+To clear it: **Ctrl+Shift+R** (Windows) or **Cmd+Shift+R** (Mac). A plain F5
+often reuses cached CSS and JS, which is exactly what makes an updated site
+look unchanged.
+
+CSS and JS are loaded as `styles.css?v=7`, so bumping that number in
+`index.html` guarantees returning visitors get the new files. HTML itself
+can't be versioned that way, which is why a hard refresh is still the tool
+for "the page looks old".
 
 **The page scrolls sideways on a phone.**
 Something is wider than the viewport. Find it in DevTools console:
