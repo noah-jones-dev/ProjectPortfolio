@@ -13,7 +13,8 @@
      8. initCardGlow()   feed the cursor position to the CSS card glow
      9. showToast()      the slide-up confirmation message
     10. initCopyButtons() copy-to-clipboard for anything with data-copy
-    11. initMisc()       copyright year
+    11. initCoverArt()   hide game covers that have not been added yet
+    12. initMisc()       copyright year
 
    HOW THIS FILE IS ORGANISED
      Nine small, INDEPENDENT features, each in its own function, all called
@@ -461,7 +462,35 @@ function initCopyButtons() {
 
 
 /* ------------------------------------------------------------------ *
- * 11. SMALL BITS
+ * 11. MISSING COVER ART
+ * ------------------------------------------------------------------
+ * Each game card points at assets/games/<slug>.png. When a cover has not
+ * been added yet that request 404s, and the browser draws its own broken
+ * image icon, which looks like a bug rather than a gap.
+ *
+ * Removing the <img> on error reveals the gradient and emoji sitting
+ * underneath it, so a card without a cover still looks intentional. Drop
+ * the file in later and it simply appears.
+ *
+ * The listener is attached with addEventListener rather than an inline
+ * onerror so the markup stays free of behaviour, and it is registered
+ * before the image can finish loading. An error that fires earlier than
+ * this (a cached 404) is caught by the `complete` check below.
+ * ------------------------------------------------------------------ */
+function initCoverArt() {
+  document.querySelectorAll('.card__shot').forEach((img) => {
+    const drop = () => img.remove();
+
+    img.addEventListener('error', drop);
+
+    // Already finished before this ran? naturalWidth is 0 for a failed load.
+    if (img.complete && img.naturalWidth === 0) drop();
+  });
+}
+
+
+/* ------------------------------------------------------------------ *
+ * 12. SMALL BITS
  * ------------------------------------------------------------------ */
 function initMisc() {
   // Keep the copyright year honest without anyone editing it each January.
@@ -490,4 +519,5 @@ initFilters();
 initCounters();
 initCardGlow();
 initCopyButtons();
+initCoverArt();
 initMisc();

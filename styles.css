@@ -917,7 +917,8 @@ code {
 
 /* Game cover art placeholder, a gradient panel until real screenshots land. */
 .card__art {
-  height: 132px;
+  position: relative;
+  height: 170px;
   margin: -1.4rem -1.4rem 1.1rem;
   display: grid;
   place-items: center;
@@ -925,8 +926,33 @@ code {
   border-bottom: 1px solid var(--border);
   overflow: hidden;
 }
-.card__art span { transition: transform var(--dur-slow) var(--ease-pop); }
-.card:hover .card__art span { transform: scale(1.18) rotate(7deg); }
+/*
+  The emoji sits UNDER the cover image. If the image loads it covers the
+  whole panel; if it is missing, script.js removes the broken <img> and the
+  gradient plus emoji show through. That is why a game with no cover yet
+  still looks deliberate rather than broken.
+*/
+.card__artemoji {
+  position: absolute;
+  transition: transform var(--dur-slow) var(--ease-pop);
+}
+.card:hover .card__artemoji { transform: scale(1.18) rotate(7deg); }
+
+/*
+  object-fit: cover fills the panel without squashing the art, cropping the
+  overflow instead. Without it a 630x500 cover would stretch to the panel's
+  shape. The image is absolutely positioned so it never changes the card's
+  height, which keeps the layout identical whether a cover exists or not.
+*/
+.card__shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease);
+}
+.card:hover .card__shot { transform: scale(1.06); }
 /* One gradient per game so the cards are visually distinguishable.
    color-mix() blends an accent into the surface colour, which means these
    automatically re-tint when the theme changes, no light-mode variants. */
@@ -1549,7 +1575,8 @@ code {
   }
   .card:hover .card__glow      { opacity: 0; }
   .card:hover .card__icon      { transform: none; }
-  .card:hover .card__art span  { transform: none; }
+  .card:hover .card__artemoji  { transform: none; }
+  .card:hover .card__shot      { transform: none; }
 
   .contactcard:hover           { transform: none; box-shadow: none; border-color: var(--border); }
   .contactcard:hover::before   { opacity: 0; transform: translateY(100%); }
