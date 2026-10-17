@@ -838,16 +838,11 @@
       Same card component as Work, plus a .card__art panel on top and no
       data-cat (the filter chips only apply to the Work grid).
 
-      The .card__art blocks are gradient placeholders with an emoji. Swapping
-      in real cover images is the single biggest visual upgrade available here:
-
-        <div class="card__art">
-          <img src="assets/bored-crc.jpg" alt="Bored CRC Specialist gameplay"
-               width="800" height="450" loading="lazy">
-        </div>
-
-      Always set width/height (stops the page jumping as images load) and
-      loading="lazy" for anything below the fold.
+      Each .card__art holds a gameplay screenshot from assets/. The
+      card__art--* gradient stays underneath as the fallback while the image
+      loads (or if it fails). Always set width/height on the <img> (stops the
+      page jumping as images load) and loading="lazy" for anything below the
+      fold.
       ==========================================================================
     -->
     <section class="section section--games" id="games">
@@ -864,7 +859,10 @@
 
         <article class="card card--game reveal">
           <div class="card__glow" aria-hidden="true"></div>
-          <div class="card__art card__art--crc" aria-hidden="true"><span>🖇️</span></div>
+          <div class="card__art card__art--crc">
+            <img src="assets/bored-crc.png" alt="Bored CRC Specialist: an office worker at a desk with a laptop, in a wood-panelled office"
+                 width="315" height="250" loading="lazy">
+          </div>
           <header class="card__head">
             <div>
               <h3 class="card__title">Bored CRC Specialist</h3>
@@ -902,7 +900,10 @@
 
         <article class="card card--game reveal">
           <div class="card__glow" aria-hidden="true"></div>
-          <div class="card__art card__art--biz" aria-hidden="true"><span>💼</span></div>
+          <div class="card__art card__art--biz">
+            <img src="assets/bored-businessman.png" alt="Bored Businessman: a security guard standing by an orange car outside the bank"
+                 width="315" height="250" loading="lazy">
+          </div>
           <header class="card__head">
             <div>
               <h3 class="card__title">Bored Businessman</h3>
@@ -947,7 +948,10 @@
         -->
         <article class="card card--game reveal">
           <div class="card__glow" aria-hidden="true"></div>
-          <div class="card__art card__art--kids" aria-hidden="true"><span>🔔</span></div>
+          <div class="card__art card__art--kids">
+            <img src="assets/bored-kids.png" alt="Bored Kids Ding Dong Ditching Houses: a kid in a gaming chair in a messy bedroom at night"
+                 width="315" height="250" loading="lazy">
+          </div>
           <header class="card__head">
             <div>
               <h3 class="card__title">Bored Kids Ding Dong Ditching Houses</h3>
