@@ -236,17 +236,18 @@ Google sign-in wall instead of the document.
 Add an `<a href="#yourSection">` inside `.nav__links`. Smooth scrolling and the
 active-link underline both work automatically.
 
-### Swap the game placeholders for real screenshots
+### Change a game screenshot
 
-Replace the emoji `<span>` inside `.card__art` with:
+Game screenshots live in `assets/`. Replace the file (or point the `<img>`
+inside `.card__art` at a new one):
 
 ```html
-<img src="assets/bored-crc.jpg" alt="Bored CRC Specialist gameplay"
-     width="800" height="450" loading="lazy">
+<img src="assets/bored-crc.png" alt="Bored CRC Specialist: …"
+     width="315" height="250" loading="lazy">
 ```
 
-Always set `width`/`height` (stops the page jumping as images load), use
-`loading="lazy"` below the fold, and export to WebP or JPEG under ~200 KB.
+Always set `width`/`height` to the image's real size (stops the page jumping as
+images load), use `loading="lazy"` below the fold, and keep files under ~200 KB.
 
 ---
 
